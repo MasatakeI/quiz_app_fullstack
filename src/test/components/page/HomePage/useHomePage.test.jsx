@@ -5,17 +5,17 @@ import { act } from "@testing-library/react";
 
 import quizContentReducer, {
   contentInitialState,
-} from "../../../../redux/features/quizContent/quizContentSlice";
+} from "@/redux/features/quizContent/quizContentSlice";
 import quizProgressReducer, {
   progressInitialState,
-} from "../../../../redux/features/quizProgress/quizProgressSlice";
+} from "@/redux/features/quizProgress/quizProgressSlice";
 import quizSettingsReducer, {
   settingsInitialState,
-} from "../../../../redux/features/quizSettings/quizSettingsSlice";
+} from "@/redux/features/quizSettings/quizSettingsSlice";
 
 import snackbarReducer from "@/redux/features/snackbar/snackbarSlice";
 
-import { useHomePage } from "../../../../components/page/HomePage/useHomePage";
+import { useHomePage } from "@/components/page/HomePage/useHomePage";
 
 import { renderHookWithStore } from "@/test/utils/renderHookWithStore";
 
@@ -76,7 +76,7 @@ describe("useHomePage.js", () => {
       expect(state.amount).toBe(10);
 
       expect(mockNavigate).toHaveBeenCalledWith(
-        "/quiz/music?type=multiple&difficulty=hard&amount=10",
+        "/quiz/play/music?type=multiple&difficulty=hard&amount=10",
       );
     });
 
@@ -100,7 +100,7 @@ describe("useHomePage.js", () => {
       });
 
       expect(mockNavigate).toHaveBeenCalledWith(
-        "/quiz/music?type=boolean&difficulty=hard&amount=5",
+        "/quiz/play/music?type=boolean&difficulty=hard&amount=5",
       );
     });
 

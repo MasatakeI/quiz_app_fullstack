@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import "./Header.css";
-
-import Tooltip from "@mui/material/Tooltip";
+import HeaderIconButton from "./HeaderIconButton";
 
 import { useNavigationHelper } from "@/hooks/useNavigationHelper";
+import { faHistory, faHome } from "@fortawesome/free-solid-svg-icons";
+import { useLocation } from "react-router";
 
 const Header = () => {
-  const { handleGoHome } = useNavigationHelper();
+  const { handleGoHome, handleGoHistory } = useNavigationHelper();
+  const location = useLocation();
 
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -21,15 +23,24 @@ const Header = () => {
 
   return (
     <div role="banner" className={`header ${isScrolled ? "scrolled" : ""}`}>
-      <Tooltip title="ホームへ戻る">
-        <button
+      <h1 className="logo" onClick={handleGoHome} style={{ cursor: "pointer" }}>
+        クイズアプリ
+      </h1>
+
+      <div className="icons-container">
+        <HeaderIconButton
+          icon={faHome}
+          title={"ホームへ戻る"}
           onClick={handleGoHome}
-          className="logo"
-          aria-label="ホームへ戻る"
-        >
-          クイズアプリ
-        </button>
-      </Tooltip>
+          isActive={location.pathname === "/"}
+        />
+        <HeaderIconButton
+          icon={faHistory}
+          title={"クイズの記録を見る"}
+          onClick={handleGoHistory}
+          isActive={location.pathname === "/quiz/history"}
+        />
+      </div>
     </div>
   );
 };

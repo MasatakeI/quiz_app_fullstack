@@ -19,10 +19,6 @@ const HistoryPage = () => {
     dispatch(fetchHistoriesAsync());
   }, [dispatch]);
 
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
-
   if (error) {
     return (
       <div>
@@ -32,6 +28,10 @@ const HistoryPage = () => {
         </Button>
       </div>
     );
+  }
+
+  if (isLoading) {
+    return <LoadingSpinner />;
   }
 
   return <QuizHistory />;

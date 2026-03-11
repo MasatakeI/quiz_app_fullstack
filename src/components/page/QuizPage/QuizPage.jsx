@@ -14,7 +14,10 @@ import {
   selectFetchError,
   selectIsLoading,
 } from "@/redux/features/quizContent/quizContentSelector";
-import { selectQuizFinished } from "@/redux/features/quizProgress/quizProgressSelector";
+import {
+  selectIsQuizFinished,
+  selectIsQuizInProgress,
+} from "@/redux/features/quizProgress/quizProgressSelector";
 import { useParams, useSearchParams } from "react-router";
 
 const QuizPage = () => {
@@ -24,7 +27,8 @@ const QuizPage = () => {
   const isLoading = useSelector(selectIsLoading);
   const fetchError = useSelector(selectFetchError);
 
-  const quizFinished = useSelector(selectQuizFinished);
+  const isQuizInProgress = useSelector(selectIsQuizInProgress);
+  const quizFinished = useSelector(selectIsQuizFinished);
 
   const [params] = useSearchParams();
   const type = params.get("type");
@@ -35,12 +39,24 @@ const QuizPage = () => {
     dispatch(fetchQuizzesAsync({ category, type, difficulty, amount }));
   }, [dispatch, category, type, difficulty, amount]);
 
-  if (isLoading || fetchError) {
-    return <QuizLoading />;
-  }
+  // クイズ実行中のコンポーネント内
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (isQuizInProgress && !quizFinished) {
+        e.preventDefault();
+        e.returnValue = ""; // ブラウザ標準のダイアログを表示
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isQuizInProgress, quizFinished]);
 
   if (quizFinished) {
     return <QuizResult />;
+  }
+  if (isLoading || fetchError) {
+    return <QuizLoading />;
   }
 
   return <QuizContent />;

@@ -91,7 +91,7 @@ export const useHomePage = () => {
       dispatch(setQuizSettings(settingValues));
 
       navigate(
-        `/quiz/${category}?type=${type}&difficulty=${difficulty}&amount=${finalAmount}`,
+        `/quiz/play/${category}?type=${type}&difficulty=${difficulty}&amount=${finalAmount}`,
       );
     } catch (error) {
       dispatch(

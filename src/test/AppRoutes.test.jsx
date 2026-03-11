@@ -8,20 +8,31 @@ import AppRoutes from "@/AppRoutes";
 
 import { renderWithStore } from "./utils/renderWithStore";
 
-import { contentInitialState } from "@/redux/features/quizContent/quizContentSlice";
-import { progressInitialState } from "@/redux/features/quizProgress/quizProgressSlice";
-import { settingsInitialState } from "@/redux/features/quizSettings/quizSettingsSlice";
-import { snackbarInitialState } from "@/redux/features/snackbar/snackbarSlice";
-import quizContentReducer from "@/redux/features/quizContent/quizContentSlice";
-import quizProgressReducer from "@/redux/features/quizProgress/quizProgressSlice";
-import quizSettingsReducer from "@/redux/features/quizSettings/quizSettingsSlice";
-import snackbarReducer from "@/redux/features/snackbar/snackbarSlice";
+import quizContentReducer, {
+  contentInitialState,
+} from "@/redux/features/quizContent/quizContentSlice";
+import quizProgressReducer, {
+  progressInitialState,
+} from "@/redux/features/quizProgress/quizProgressSlice";
+import quizSettingsReducer, {
+  settingsInitialState,
+} from "@/redux/features/quizSettings/quizSettingsSlice";
+import snackbarReducer, {
+  snackbarInitialState,
+} from "@/redux/features/snackbar/snackbarSlice";
+
+import quizHistoryReducer, {
+  quizHistoryInitialState,
+} from "@/redux/features/quizHistory/quizHistorySlice";
 
 vi.mock("@/components/page/HomePage/HomePage", () => ({
   default: () => <div data-testid="home-page">HomePage</div>,
 }));
 vi.mock("@/components/page/QuizPage/QuizPage", () => ({
   default: () => <div data-testid="quiz-page">QuizPage</div>,
+}));
+vi.mock("@/components/page/HistoryPage/HistoryPage", () => ({
+  default: () => <div data-testid="history-page">HistoryPage</div>,
 }));
 
 describe("AppRoutes.jsx", () => {
@@ -34,12 +45,14 @@ describe("AppRoutes.jsx", () => {
       quizProgress: quizProgressReducer,
       quizSettings: quizSettingsReducer,
       snackbar: snackbarReducer,
+      quizHistory: quizHistoryReducer,
     },
     preloadedState: {
       quizContent: { ...contentInitialState },
       quizProgress: { ...progressInitialState },
       quizSettings: { ...settingsInitialState },
       snackbar: { ...snackbarInitialState },
+      quizHistory: { ...quizHistoryInitialState },
     },
   };
 
@@ -55,15 +68,27 @@ describe("AppRoutes.jsx", () => {
     expect(screen.queryByTestId("quiz-page")).not.toBeInTheDocument();
   });
 
-  test("/quiz/:category にアクセスすると QuizPage が表示される", () => {
+  test("/quiz/play/:category にアクセスすると QuizPage が表示される", () => {
     renderWithStore(
-      <MemoryRouter initialEntries={["/quiz/sports"]}>
+      <MemoryRouter initialEntries={["/quiz/play/sports"]}>
         <AppRoutes />
       </MemoryRouter>,
       commonOptions,
     );
 
     expect(screen.getByTestId("quiz-page")).toBeInTheDocument();
+  });
+
+  test("/quiz/history にアクセスすると HistoryPage が表示される", () => {
+    renderWithStore(
+      <MemoryRouter initialEntries={["/quiz/history"]}>
+        <AppRoutes />
+      </MemoryRouter>,
+      commonOptions,
+    );
+
+    expect(screen.getByTestId("history-page")).toBeInTheDocument();
+    expect(screen.queryByTestId("quiz-page")).not.toBeInTheDocument();
   });
 
   test("存在しないパスにアクセスした時HomePageにリダイレクトする", () => {

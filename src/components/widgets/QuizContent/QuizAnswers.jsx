@@ -24,7 +24,15 @@ const QuizAnswers = ({
     }
 
     return (
-      <Grid size={{ xs: 12, sm: 6, lg: 3 }} key={index} className="answer">
+      <Grid
+        size={
+          shuffledAnswers.length === 4
+            ? { xs: 12, sm: 6, lg: 3 }
+            : { xs: 12, sm: 6 }
+        }
+        key={index}
+        className="answer"
+      >
         <Button
           // variant="secondary"
           onClickHandler={() => onSelect(answer)}

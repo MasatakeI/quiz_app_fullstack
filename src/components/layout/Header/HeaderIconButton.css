@@ -1,0 +1,32 @@
+.header-button {
+  background-color: inherit;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  transform: scale(0.9);
+  transition: all ease 0.15s;
+  width: 40px;
+  height: 40px;
+  color: #fff;
+  border: 1px solid #fff;
+  border-radius: 50%;
+}
+
+.header-button.active {
+  background-color: #ffd700;
+  color: #1b2f4a;
+  /* box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); */
+  transform: scale(1); /* 少し大きくして強調 */
+}
+
+/* hover スタイルとの兼ね合い */
+.header-button.active:hover {
+  /* background-color: #ffcc00; */
+  transform: scale(1) translateY(-1px);
+}
+
+.header-button:hover {
+  transform: translateY(-1px) scale(0.9);
+  color: #1b2f4a;
+  background-color: #fff;
+}

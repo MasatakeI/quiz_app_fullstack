@@ -30,10 +30,6 @@ const QuizLoading = () => {
 
   const { handleGoHome } = useNavigationHelper();
 
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
-
   if (fetchError) {
     return (
       <div className="quiz-loading">
@@ -53,6 +49,10 @@ const QuizLoading = () => {
         </div>
       </div>
     );
+  }
+
+  if (isLoading) {
+    return <LoadingSpinner />;
   }
 
   return null;

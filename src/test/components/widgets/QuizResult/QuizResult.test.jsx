@@ -91,7 +91,8 @@ describe("QuizResult.jsxのテスト", () => {
     renderWithStore(<QuizResult />, commonOptions);
 
     //QuizResultVies.jsx
-    expect(await screen.findByText("スポーツクイズ 結果")).toBeInTheDocument();
+    // デザイン変更で「スポーツ クイズ結果」になっても通るようにする
+    expect(await screen.findByText(/スポーツ.*結果/)).toBeInTheDocument();
     //ResultSummary.jsx
     expect(screen.getByTestId("result-summary")).toBeInTheDocument();
 
@@ -102,13 +103,16 @@ describe("QuizResult.jsxのテスト", () => {
       name: "同じ条件でもう1度",
     });
 
-    const historyButton = screen.getByRole("button", { name: "記録を見る" });
+    const historyButtons = screen.getAllByRole("button", {
+      name: "記録を見る",
+    });
 
     expect(goHomeButtons[0]).toBeInTheDocument();
-    expect(goHomeButtons).toHaveLength(1);
+    expect(goHomeButtons).toHaveLength(2);
     expect(retryButtons[0]).toBeInTheDocument();
-    expect(retryButtons).toHaveLength(1);
-    expect(historyButton).toBeInTheDocument();
+    expect(retryButtons).toHaveLength(2);
+    expect(historyButtons[0]).toBeInTheDocument();
+    expect(historyButtons).toHaveLength(2);
   });
 
   test("ホームへ戻るボタンを押すとhandleGoHomeが呼ばれる", async () => {
@@ -120,8 +124,11 @@ describe("QuizResult.jsxのテスト", () => {
       name: "ホームへ戻る",
     });
 
-    await user.click(goHomeButtons[0]);
-    expect(mockNavigate).toHaveBeenCalledWith("/");
+    for (const button of goHomeButtons) {
+      await user.click(button);
+      expect(mockNavigate).toHaveBeenCalledWith("/");
+    }
+
     expect(dispatchSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         type: "quizContent/resetQuizContent",
@@ -146,16 +153,19 @@ describe("QuizResult.jsxのテスト", () => {
     expect(dispatchSpy).toHaveBeenCalledWith(expect.any(Function));
   });
 
-  test("記録を見るボタンを押すと navigateが呼ばれる", async () => {
+  test("記録を見るボタンを押すと handleGoHistoryが呼ばれる", async () => {
     const user = userEvent.setup();
-    renderWithStore(<QuizResult />, commonOptions);
+    const { dispatchSpy } = renderWithStore(<QuizResult />, commonOptions);
 
-    const historyButton = screen.getByRole("button", {
+    const historyButtons = screen.getAllByRole("button", {
       name: "記録を見る",
     });
 
-    await user.click(historyButton);
+    for (const button of historyButtons) {
+      await user.click(button);
+      expect(mockNavigate).toHaveBeenCalledWith("/quiz/history");
+    }
 
-    expect(mockNavigate).toHaveBeenCalledWith("/quiz/history");
+    expect(dispatchSpy).toHaveBeenCalledWith(expect.any(Function));
   });
 });

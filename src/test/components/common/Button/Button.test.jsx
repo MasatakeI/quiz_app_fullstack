@@ -45,6 +45,27 @@ describe("Button.jsx", () => {
     expect(screen.getByText("送信")).toHaveClass("button-secondary");
   });
 
+  test("colorStatus がある時 正しいステータスクラスが付与される", () => {
+    render(
+      <Button onClickHandler={() => {}} colorStatus={"correct"}>
+        送信
+      </Button>,
+    );
+
+    const button = screen.getByRole("button", { name: "送信" });
+    expect(button).toHaveClass("button-status-correct");
+
+    render(
+      <Button onClickHandler={() => {}} colorStatus={"incorrect"}>
+        送信
+      </Button>,
+    );
+
+    expect(button).toHaveClass(
+      " button button button-primary button-status-correct",
+    );
+  });
+
   test("clickbale=falseかつcolorStatusなしの時 disabled=trueになる", () => {
     render(
       <Button
@@ -69,5 +90,13 @@ describe("Button.jsx", () => {
     );
 
     expect(screen.getByRole("button", { name: "送信" })).not.toBeDisabled();
+  });
+
+  test("デフォルトの props で正しいクラスと活性状態を持つ", () => {
+    render(<Button onClickHandler={() => {}}>デフォルト</Button>);
+    const button = screen.getByRole("button", { name: "デフォルト" });
+
+    expect(button).toHaveClass("button button-primary");
+    expect(button).not.toBeDisabled();
   });
 });

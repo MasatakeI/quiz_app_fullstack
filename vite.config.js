@@ -19,6 +19,9 @@ export default defineConfig({
     globals: true, // expect などを global で使えるようにする
     environment: "jsdom", // ブラウザ環境をシミュレート
     setupFiles: ["./src/setupTests.js"], // 初期設定ファイルを指定
+    coverage: {
+      exclude: ["**/*.css", "**/node_modules/**"], // CSSを除外
+    },
   },
 
   resolve: {
@@ -36,6 +39,7 @@ export default defineConfig({
       "**/*.test.*",
       "**/*.spec.*",
       "src/main.jsx",
+      "**/*.css",
     ],
   },
 });

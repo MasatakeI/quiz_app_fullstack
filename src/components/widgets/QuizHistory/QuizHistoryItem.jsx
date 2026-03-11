@@ -1,35 +1,57 @@
 import React from "react";
 
 import "./QuizHistoryItem.css";
-import Button from "@/components/common/Button/Button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import IconButton from "@/components/common/IconButton/IconButton";
+
+import { faArrowsRotate, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { DIFFICULTY_LABELS, TYPE_LABELS } from "@/constants/quizTranslations";
+import { QUIZ_TITLE_MAP } from "@/constants/quizCategories";
 
 const QuizHistoryItem = ({
   historyDate,
   historyCategory,
+  historyType,
   historyScore,
-  historyTotalQuesitions,
+  historyTotalQuestions,
   historyAccuracy,
   historyDifficulty,
   onDelete,
+  onRetry,
 }) => {
   return (
     <div className="history-card">
       <div className="history-header">
         <span className="history-date">{historyDate}</span>
-        <span className="history-category">{historyCategory}</span>
-        <span className="history-difficulty">{historyDifficulty}</span>
-        <button onClick={onDelete} className="history-delete-button">
-          <FontAwesomeIcon icon={faTrash} />
-        </button>
+        <div>
+          <IconButton
+            title="同じ条件で再挑戦"
+            onClick={onRetry}
+            icon={faArrowsRotate}
+          />
+          <IconButton
+            title="削除"
+            onClick={onDelete}
+            icon={faTrash}
+            isDelete={true}
+          />
+        </div>
       </div>
 
+      <span className="history-label">CONDITIONS</span>
+      <div className="history-conditions">
+        <span className="history-category">
+          {QUIZ_TITLE_MAP[historyCategory]}
+        </span>
+        <span className="history-difficulty">
+          {DIFFICULTY_LABELS[historyDifficulty]}
+        </span>
+        <span className="history-difficulty">{TYPE_LABELS[historyType]}</span>
+      </div>
       <div className="history-stats">
         <div className="history-stat-item">
           <span className="history-label">Score</span>
           <span className="history-value">
-            {historyScore}/{historyTotalQuesitions}
+            {historyScore}/{historyTotalQuestions}
           </span>
         </div>
         <div className="history-stat-item">

@@ -4,9 +4,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams, useSearchParams } from "react-router";
 
 import {
+  selectIsQuizFinished,
   selectNumberOfCorrects,
   selectNumberOfIncorrects,
-  selectQuizFinished,
   selectResultData,
   selectUserAnswers,
 } from "@/redux/features/quizProgress/quizProgressSelector";
@@ -15,7 +15,6 @@ import { getQuizTitle } from "../../../constants/quizCategories";
 import { fetchQuizzesAsync } from "@/redux/features/quizContent/quizContentThunks";
 
 import { useNavigationHelper } from "@/hooks/useNavigationHelper";
-import { useNavigate } from "react-router";
 import { selectHistoryCanPost } from "@/redux/features/quizHistory/quizHistorySelector";
 import { useEffect, useRef } from "react";
 import { addHistoryAsync } from "@/redux/features/quizHistory/quizHistoryThunks";
@@ -27,10 +26,9 @@ import {
 
 export const useQuizResult = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const { category } = useParams();
-  const { handleGoHome } = useNavigationHelper();
+  const { handleGoHome, handleGoHistory } = useNavigationHelper();
 
   const numberOfCorrects = useSelector(selectNumberOfCorrects);
   const numberOfIncorrects = useSelector(selectNumberOfIncorrects);
@@ -38,7 +36,7 @@ export const useQuizResult = () => {
 
   const resultData = useSelector(selectResultData);
   const historyCanPost = useSelector(selectHistoryCanPost);
-  const quizFinished = useSelector(selectQuizFinished);
+  const quizFinished = useSelector(selectIsQuizFinished);
 
   const hasSaved = useRef(false);
   const [params] = useSearchParams();
@@ -68,7 +66,7 @@ export const useQuizResult = () => {
     numberOfIncorrects,
     handleGoHome,
     handleRetry,
-    navigate,
+    handleGoHistory,
     amount,
     getType,
     getDifficulty,

@@ -8,10 +8,10 @@ import { Routes, Route, Navigate } from "react-router";
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="*" element={<Navigate to="/" replace />} />
       <Route path="/" element={<HomePage />} />
-      <Route path="/quiz/:category" element={<QuizPage />} />
       <Route path="/quiz/history" element={<HistoryPage />} />
+      <Route path="/quiz/play/:category" element={<QuizPage />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };

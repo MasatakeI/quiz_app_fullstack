@@ -33,13 +33,14 @@ export const createHistory = (id, data) => {
     });
   }
 
-  const dateObj = format(data.date.toDate(), "yyyy/MM/dd");
+  const dateObj = format(data.date.toDate(), "yyyy/MM/dd HH:mm");
 
   return {
     id,
     category: data.category,
     date: dateObj,
     difficulty: data.difficulty,
+    type: data.type,
     score: data.score,
     totalQuestions: data.totalQuestions,
     accuracy:

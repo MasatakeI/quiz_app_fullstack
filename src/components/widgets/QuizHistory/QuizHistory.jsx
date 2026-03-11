@@ -1,8 +1,11 @@
 //src/components/widgets/QuizHistory/QuizHistory.jsx
 
-import React from "react";
+import React, { useState } from "react";
 import "./QuizHistory.css";
+
 import QuizHistoryItem from "./QuizHistoryItem";
+import Button from "@/components/common/Button/Button";
+import Modal from "@/components/common/Modal/Modal";
 
 import { useDispatch, useSelector } from "react-redux";
 import { selectAllHistories } from "@/redux/features/quizHistory/quizHistorySelector";
@@ -11,8 +14,6 @@ import { deleteHistoryAsync } from "@/redux/features/quizHistory/quizHistoryThun
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 
-import Button from "@/components/common/Button/Button";
-
 import { useNavigationHelper } from "@/hooks/useNavigationHelper";
 
 const QuizHistory = () => {
@@ -20,7 +21,20 @@ const QuizHistory = () => {
 
   const histories = useSelector(selectAllHistories);
 
-  const { handleGoHome } = useNavigationHelper();
+  const { handleGoHome, handleRetryFromHistory } = useNavigationHelper();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [targetId, setTargetId] = useState(null);
+
+  if (histories.length === 0) {
+    return (
+      <div>
+        <h1 className="title">クイズの記録</h1>
+        <p>記録がありません クイズに回答後 記録してください</p>
+        <Button onClickHandler={handleGoHome}>ホームへ戻る</Button>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -38,11 +52,16 @@ const QuizHistory = () => {
                 <QuizHistoryItem
                   historyDate={his.date}
                   historyCategory={his.category}
+                  historyType={his.type}
                   historyScore={his.score}
-                  historyTotalQuesitions={his.totalQuestions}
+                  historyTotalQuestions={his.totalQuestions}
                   historyAccuracy={his.accuracy}
                   historyDifficulty={his.difficulty}
-                  onDelete={() => dispatch(deleteHistoryAsync({ id: his.id }))}
+                  onDelete={() => {
+                    setIsModalOpen(true);
+                    setTargetId(his.id);
+                  }}
+                  onRetry={() => handleRetryFromHistory(his.id)}
                 />
               </Grid>
             );
@@ -50,7 +69,18 @@ const QuizHistory = () => {
         </Grid>
       </Box>
 
-      <Button onClickHandler={handleGoHome}>ホームへ戻る</Button>
+      {/* <Button onClickHandler={handleGoHome}>ホームへ戻る</Button> */}
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={"この記録を削除しますか?"}
+        onConfirm={() => {
+          dispatch(deleteHistoryAsync({ id: targetId }));
+          setIsModalOpen(false);
+          setTargetId(null);
+        }}
+      />
     </div>
   );
 };

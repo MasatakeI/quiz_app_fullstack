@@ -136,22 +136,26 @@ describe("QuizModel.jsのテスト", () => {
       {
         params: { ...validParams, category: "" },
         field: "category",
+        title: "category",
         message: "ジャンルを選択してください",
       },
 
       {
         params: { ...validParams, type: "" },
         field: "type",
+        title: "type",
         message: "タイプを選択してください",
       },
       {
         params: { ...validParams, difficulty: "" },
         field: "difficulty",
+        title: "difficulty",
         message: "レベルを選択してください",
       },
       {
         params: { ...validParams, amount: null },
         field: "amount",
+        title: "amount",
         message: "問題数を選択してください",
       },
     ])(`$title`, ({ params, field, message }) => {

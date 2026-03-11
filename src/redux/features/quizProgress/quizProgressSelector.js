@@ -8,8 +8,6 @@ import {
 } from "../../../models/QuizModel";
 import { selectQuizSettings } from "../quizSettings/quizSettingsSelector";
 
-import { QUIZ_TITLE_MAP } from "@/constants/quizCategories";
-
 export const selectCurrentIndex = (state) => state.quizProgress.currentIndex;
 export const selectNumberOfCorrects = (state) =>
   state.quizProgress.numberOfCorrects;
@@ -45,7 +43,14 @@ export const selectTransilateCurrentDifficulty = createSelector(
   },
 );
 
-export const selectQuizFinished = createSelector(
+export const selectIsQuizInProgress = createSelector(
+  [selectAllQuizzes, selectCurrentIndex],
+  (quizzes, currentIndex) => {
+    return quizzes.length > 0 && currentIndex < quizzes.length;
+  },
+);
+
+export const selectIsQuizFinished = createSelector(
   [selectAllQuizzes, selectCurrentIndex],
   (quizzes, currentIndex) => {
     return quizzes.length > 0 && currentIndex >= quizzes.length;
@@ -56,14 +61,11 @@ export const selectResultData = createSelector(
   [selectQuizSettings, selectNumberOfCorrects, selectAllQuizzes],
   (settings, numberOfCorrects, quizzes) => {
     if (!settings && quizzes.length === 0) return null;
-    const DIFFICULTY_MAP = {
-      easy: "かんたん",
-      medium: "ふつう",
-      hard: "むずかしい",
-    };
+
     return {
-      category: QUIZ_TITLE_MAP[settings.category],
-      difficulty: DIFFICULTY_MAP[settings.difficulty],
+      category: settings.category,
+      difficulty: settings.difficulty,
+      type: settings.type,
       score: numberOfCorrects,
       totalQuestions: quizzes.length,
     };

@@ -7,7 +7,6 @@ import { useQuizResult } from "./useQuizResult";
 import ResultSummary from "./ResultSummary/ResultSummary";
 import QuizResultView from "./QuizResultView";
 import ResultButtonContainer from "./ResultButtonContainer";
-import Button from "@/components/common/Button/Button";
 
 const QuizResult = () => {
   const {
@@ -15,13 +14,15 @@ const QuizResult = () => {
     userAnswers,
     numberOfCorrects,
     numberOfIncorrects,
-    handleGoHome,
-    handleRetry,
-    navigate,
+
     amount,
     getType,
     getDifficulty,
     INDEX_MAP,
+
+    handleGoHome,
+    handleRetry,
+    handleGoHistory,
   } = useQuizResult();
 
   return (
@@ -35,17 +36,19 @@ const QuizResult = () => {
         getType={getType}
       />
 
-      <ResultButtonContainer onNavigate={handleGoHome} onRetry={handleRetry} />
+      <ResultButtonContainer
+        onNavigate={handleGoHome}
+        onRetry={handleRetry}
+        onNavigateToHistory={handleGoHistory}
+      />
 
       <ResultSummary userAnswers={userAnswers} indexMap={INDEX_MAP} />
 
-      <Button
-        onClickHandler={() => {
-          navigate("/quiz/history");
-        }}
-      >
-        記録を見る
-      </Button>
+      <ResultButtonContainer
+        onNavigate={handleGoHome}
+        onRetry={handleRetry}
+        onNavigateToHistory={handleGoHistory}
+      />
     </div>
   );
 };

@@ -165,7 +165,7 @@ describe("HomePage.jsx", () => {
     const startButton = screen.getByRole("button", { name: "クイズスタート" });
     await user.click(startButton);
     expect(mockNavigate).toHaveBeenCalledWith(
-      "/quiz/sports?type=multiple&difficulty=easy&amount=10",
+      "/quiz/play/sports?type=multiple&difficulty=easy&amount=10",
     );
 
     expect(mockNavigate).toHaveBeenCalledTimes(1);

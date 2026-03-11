@@ -44,7 +44,7 @@ export const deleteHistoryAsync = createModelThunk(
   async ({ id }, thunkApi) => {
     const targetHistory = await deleteHistory(id);
 
-    thunkApi.dispatch(showSnackbar("クイズ結果の削除に成功しました"));
+    thunkApi.dispatch(showSnackbar(`クイズ結果の削除に成功しました`));
     return targetHistory;
   },
   {

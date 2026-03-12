@@ -4,7 +4,7 @@ import { vi } from "vitest";
 
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
-import { Routes, Route, Router } from "react-router";
+import { Router } from "react-router";
 import { renderHook } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 
@@ -12,10 +12,7 @@ export const renderHookWithStore = ({
   hook,
   reducers,
   preloadedState,
-  initialPath = "/quiz",
-  history = createMemoryHistory({
-    initialEntries: [initialPath],
-  }),
+  initialPath = "/", // デフォルトをルートに
 }) => {
   const store = configureStore({
     reducer: reducers,
@@ -24,7 +21,13 @@ export const renderHookWithStore = ({
 
   const dispatchSpy = vi.spyOn(store, "dispatch");
 
-  const HistoryRouter = ({ history, children }) => {
+  // history.js などの外部依存を減らし、MemoryRouter のコンテキストを模倣
+  const history = createMemoryHistory({
+    initialEntries: [initialPath],
+  });
+
+  const wrapper = ({ children }) => {
+    // 状態管理のための簡易Router（HistoryRouterの代わり）
     const [state, setState] = useState({
       action: history.action,
       location: history.location,
@@ -33,27 +36,26 @@ export const renderHookWithStore = ({
     useLayoutEffect(() => history.listen(setState), [history]);
 
     return (
-      <Router
-        location={state.location}
-        navigationType={state.action}
-        navigator={history}
-      >
-        {children}
-      </Router>
-    );
-  };
-
-  const wrapper = ({ children }) => {
-    return (
       <Provider store={store}>
-        <HistoryRouter history={history}>
-          <Routes>
-            <Route path="*" element={children} />
-          </Routes>
-        </HistoryRouter>
+        <Router
+          location={state.location}
+          navigationType={state.action}
+          navigator={history}
+        >
+          {children}
+        </Router>
       </Provider>
     );
   };
 
-  return { ...renderHook(() => hook(), { wrapper }), store, dispatchSpy };
+  // renderHook の戻り値を明示的に受け取る
+  const renderResult = renderHook(() => hook(), { wrapper });
+
+  return {
+    result: renderResult.result,
+    unmount: renderResult.unmount,
+    rerender: renderResult.rerender,
+    store,
+    dispatchSpy,
+  };
 };

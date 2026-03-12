@@ -1,7 +1,7 @@
 // page/QuizPage/QuizPage.test.jsx
 
 import { screen } from "@testing-library/react";
-import { describe, test, expect, vi } from "vitest";
+import { describe, test, expect, vi, beforeEach } from "vitest";
 
 import { contentInitialState } from "@/redux/features/quizContent/quizContentSlice";
 import { progressInitialState } from "@/redux/features/quizProgress/quizProgressSlice";
@@ -65,7 +65,7 @@ describe("QuizPage.jsx", () => {
     },
   };
 
-  test("fetchQuizzesAsync が 正しい引数で呼ばれる", async () => {
+  test("マウント時 fetchQuizzesAsync が 正しい引数で呼ばれる", async () => {
     const fetchSpy = vi.spyOn(quizContentThunk, "fetchQuizzesAsync");
     renderWithStore(<QuizPage />, commonOption);
 
@@ -75,6 +75,67 @@ describe("QuizPage.jsx", () => {
       difficulty: "easy",
       amount: "5",
     });
+  });
+
+  test("beforeunload:クイズ進行中の場合 preventDefaultが呼ばれる", async () => {
+    const addSpy = vi.spyOn(window, "addEventListener");
+    renderWithStore(<QuizPage />, {
+      ...commonOption,
+      preloadedState: {
+        ...commonOption.preloadedState,
+        quizProgress: { currentIndex: 1 },
+      },
+    });
+
+    expect(addSpy).toHaveBeenCalledWith("beforeunload", expect.any(Function));
+
+    const handler = addSpy.mock.calls.find(
+      (call) => call[0] === "beforeunload",
+    )[1];
+
+    const event = { preventDefault: vi.fn(), returnVaue: "" };
+
+    handler(event);
+
+    expect(event.preventDefault).toHaveBeenCalled();
+
+    expect(event.returnVaue).toBe("");
+  });
+  test("beforeunload:クイズ終了後の場合 preventDefaultが呼ばれない", async () => {
+    const addSpy = vi.spyOn(window, "addEventListener");
+    renderWithStore(<QuizPage />, {
+      ...commonOption,
+      preloadedState: {
+        ...commonOption.preloadedState,
+        quizProgress: { currentIndex: 5 },
+      },
+    });
+
+    expect(addSpy).toHaveBeenCalledWith("beforeunload", expect.any(Function));
+
+    const handler = addSpy.mock.calls.find(
+      (call) => call[0] === "beforeunload",
+    )[1];
+
+    const event = { preventDefault: vi.fn(), returnVaue: "init" };
+
+    handler(event);
+
+    expect(event.preventDefault).not.toHaveBeenCalled();
+
+    expect(event.returnVaue).toBe("init");
+  });
+
+  test("アンマウント時 イベントリスナーが削除される", () => {
+    const removeSpy = vi.spyOn(window, "removeEventListener");
+    const { unmount } = renderWithStore(<QuizPage />, commonOption);
+
+    unmount();
+
+    expect(removeSpy).toHaveBeenCalledWith(
+      "beforeunload",
+      expect.any(Function),
+    );
   });
 
   test("isLoading=trueまたはfetchErrorがあるときQuizLoadingが表示される", () => {

@@ -18,6 +18,8 @@ import quizContentReducer, {
 import { renderWithStore } from "@/test/utils/renderWithStore";
 import userEvent from "@testing-library/user-event";
 
+import * as historyThunks from "@/redux/features/quizHistory/quizHistoryThunks";
+
 const mockNavigate = vi.fn();
 
 vi.mock("react-router", () => {
@@ -112,6 +114,9 @@ describe("HistoryPage", () => {
   });
 
   test("通常時は QuizHistoryが表示される", async () => {
+    vi.spyOn(historyThunks, "fetchHistoriesAsync").mockReturnValue({
+      type: "none",
+    });
     renderWithStore(<HistoryPage />, {
       ...commonOptions,
       preloadedState: {

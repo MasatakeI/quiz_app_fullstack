@@ -18,6 +18,7 @@ export const selectUserAnswers = (state) => state.quizProgress.userAnswers;
 export const selectCurrentQuiz = createSelector(
   [selectAllQuizzes, selectCurrentIndex],
   (quizzes, currentIndex) => {
+    if (!quizzes || quizzes.length === 0) return null;
     return quizzes[currentIndex];
   },
 );
@@ -46,7 +47,7 @@ export const selectTransilateCurrentDifficulty = createSelector(
 export const selectIsQuizInProgress = createSelector(
   [selectAllQuizzes, selectCurrentIndex],
   (quizzes, currentIndex) => {
-    if (!quizzes || quizzes.length === 0) return false;
+    if (!quizzes || quizzes.length === 0) return null;
     return quizzes.length > 0 && currentIndex < quizzes.length;
   },
 );
@@ -54,7 +55,7 @@ export const selectIsQuizInProgress = createSelector(
 export const selectIsQuizFinished = createSelector(
   [selectAllQuizzes, selectCurrentIndex],
   (quizzes, currentIndex) => {
-    if (!quizzes || quizzes.length === 0) return false;
+    if (!quizzes || quizzes.length === 0) return null;
     return quizzes.length > 0 && currentIndex >= quizzes.length;
   },
 );
@@ -62,15 +63,16 @@ export const selectIsQuizFinished = createSelector(
 export const selectQuizProgressPercent = createSelector(
   [selectAllQuizzes, selectCurrentIndex],
   (quizzes, currentIndex) => {
-    if (!quizzes || quizzes.length === 0) return false;
-    return (currentIndex / quizzes.length) * 100;
+    if (!quizzes || quizzes.length === 0) return null;
+    const percent = (currentIndex / quizzes.length) * 100;
+    return Math.round(percent);
   },
 );
 
 export const selectResultData = createSelector(
   [selectQuizSettings, selectNumberOfCorrects, selectAllQuizzes],
   (settings, numberOfCorrects, quizzes) => {
-    if (!settings && quizzes.length === 0) return null;
+    if (!settings?.category || !quizzes || quizzes.length === 0) return null;
 
     return {
       category: settings.category,

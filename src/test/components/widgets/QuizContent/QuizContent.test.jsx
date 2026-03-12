@@ -92,7 +92,21 @@ describe("QuizContent.jsxのテスト", () => {
     await user.click(answerButton);
 
     expect(screen.getByRole("button", { name: "次へ" })).toBeInTheDocument();
-    // expect(answerButton).toBeDisabled();
+    expect(screen.getByText(/正解!/i)).toBeInTheDocument();
+  });
+
+  test("不正解を選択した時、適切にアラートが表示される", async () => {
+    const user = userEvent.setup();
+    renderWithStore(<QuizContent />, commonOption);
+
+    // 不正解ボタンをクリック（Aが正解ならBをクリック）
+    const incorrectButton = screen.getByRole("button", { name: "B. False" });
+    await user.click(incorrectButton);
+
+    // AnswerAlert内に「不正解」またはそれに準ずるテキストが出るか確認
+    // (実装によりますが、QuizAnswerAlert内の条件分岐をテストできます)
+    expect(screen.getByText(/不正解/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "次へ" })).toBeInTheDocument();
   });
 
   test("quizResultがある時,次へボタンを押すと,次の問題が表示される", async () => {
@@ -157,5 +171,47 @@ describe("QuizContent.jsxのテスト", () => {
 
       expect(store.getState().quizProgress.currentIndex).toBe(finalIndex + 1);
     });
+  });
+
+  test("最初の問題で進捗バーが正しく計算されているか", () => {
+    renderWithStore(<QuizContent />, {
+      ...commonOption,
+      preloadedState: {
+        ...commonOption.preloadedState,
+        quizContent: {
+          ...contentInitialState,
+          quizzes: [{ question: "test1" }, { question: "test2" }],
+        },
+        quizProgress: {
+          progressInitialState,
+          currentIndex: 1,
+        },
+      },
+    });
+
+    const progressBar = screen.getByRole("progressbar");
+    expect(progressBar).toHaveAttribute("aria-valuenow", "50");
+  });
+
+  test("クイズデータが空の場合、何も表示されない（またはエラーにならない）", () => {
+    const emptyOption = {
+      ...commonOption,
+      preloadedState: {
+        ...commonOption.preloadedState,
+        quizContent: { ...contentInitialState, quizzes: [] },
+        quizProgress: { ...progressInitialState, currentIndex: 0 },
+      },
+    };
+
+    const { container } = renderWithStore(<QuizContent />, emptyOption);
+
+    // 1. タイトルや問題文などのテキストが存在しないことを確認
+    expect(screen.queryByText(/Q\d\./)).not.toBeInTheDocument();
+
+    // 2. あるいは、containerの中にある特定の子要素（QuizContentViewの中身など）が空であることを確認
+    const content = container.querySelector(".quiz-content");
+    expect(content).toBeInTheDocument();
+    // 子要素のテキストコンテンツが空であることをチェック
+    expect(content.textContent).toBe("");
   });
 });

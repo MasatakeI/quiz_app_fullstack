@@ -8,15 +8,15 @@ import { DIFFICULTY_LABELS, TYPE_LABELS } from "@/constants/quizTranslations";
 import { QUIZ_TITLE_MAP } from "@/constants/quizCategories";
 
 const QuizHistoryItem = ({
-  historyDate,
-  historyCategory,
-  historyType,
-  historyScore,
-  historyTotalQuestions,
-  historyAccuracy,
-  historyDifficulty,
-  onDelete,
-  onRetry,
+  historyDate = "",
+  historyCategory = "general", // デフォルト値を設定
+  historyType = "multiple",
+  historyScore = 0,
+  historyTotalQuestions = 0,
+  historyAccuracy = 0,
+  historyDifficulty = "easy",
+  onDelete = () => {},
+  onRetry = () => {},
 }) => {
   return (
     <div className="history-card">
@@ -41,7 +41,7 @@ const QuizHistoryItem = ({
       <div className="history-conditions">
         <span className="history-category">
           {QUIZ_TITLE_MAP[historyCategory]}
-        </span>
+        </span>{" "}
         <span className="history-difficulty">{TYPE_LABELS[historyType]}</span>
         <span className="history-difficulty">
           {DIFFICULTY_LABELS[historyDifficulty]}

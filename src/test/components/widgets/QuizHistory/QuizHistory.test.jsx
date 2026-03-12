@@ -163,4 +163,52 @@ describe("QuizHistory", () => {
 
     expect(dispatchSpy).not.toHaveBeenCalled();
   });
+
+  test("Retryボタンを押すと handleRetryFromHistoryが呼ばれる", async () => {
+    const user = userEvent.setup();
+    const { dispatchSpy } = renderWithStore(<QuizHistory />, {
+      ...commonOption,
+      preloadedState: {
+        ...commonOption.preloadedState,
+        quizHistory: {
+          ...quizHistoryInitialState,
+          histories: [
+            {
+              id: 1,
+              category: "sports",
+              type: "boolean",
+              difficulty: "easy",
+              totalQuestions: 5,
+            },
+          ],
+        },
+      },
+    });
+
+    const retryButton = screen.getByRole("button", {
+      name: "同じ条件で再挑戦",
+    });
+
+    await user.click(retryButton);
+
+    expect(dispatchSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "quizContent/resetQuizContent",
+      }),
+    );
+    expect(dispatchSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "quizSettings/setQuizSettings",
+        payload: {
+          category: "sports",
+          type: "boolean",
+          difficulty: "easy",
+          amount: 5,
+        },
+      }),
+    );
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/quiz/play/sports?type=boolean&difficulty=easy&amount=5",
+    );
+  });
 });

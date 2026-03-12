@@ -22,11 +22,15 @@ import { act } from "react";
 import { MemoryRouter } from "react-router";
 
 const mockNavigate = vi.fn();
-vi.mock("@/hooks/useNavigationHelper", () => ({
-  useNavigationHelper: () => ({
-    handleGoHome: () => mockNavigate("/"),
-  }),
-}));
+
+vi.mock("react-router", async (importOriginal) => {
+  const actual = await importOriginal();
+
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
 
 describe("Header", () => {
   beforeEach(() => {
@@ -57,9 +61,9 @@ describe("Header", () => {
       commonOption,
     );
 
-    const logoButton = screen.getByRole("button", { name: "ホームへ戻る" });
-    expect(logoButton).toBeInTheDocument();
-    await user.click(logoButton);
+    const logoTitle = screen.getByText("クイズアプリ");
+    expect(logoTitle).toBeInTheDocument();
+    await user.click(logoTitle);
 
     expect(mockNavigate).toHaveBeenCalledWith("/");
   });
@@ -94,5 +98,111 @@ describe("Header", () => {
     await waitFor(() => {
       expect(header).toHaveClass("scrolled");
     });
+  });
+  test("スクロールをトップに戻した時に scrolledクラスが除去される", async () => {
+    renderWithStore(
+      <MemoryRouter>
+        <Header />
+      </MemoryRouter>,
+      commonOption,
+    );
+
+    const header = screen.getByRole("banner");
+    act(() => {
+      window.scrollY = 100;
+      window.dispatchEvent(new Event("scroll"));
+    });
+
+    // await waitFor(() => {
+    expect(header).toHaveClass("scrolled");
+    // });
+
+    act(() => {
+      window.scrollY = 0;
+      window.dispatchEvent(new Event("scroll"));
+    });
+
+    await waitFor(() => {
+      expect(header).not.toHaveClass("scrolled");
+    });
+  });
+
+  test("ホームアイコンをクリックすると ホームページへ戻る", async () => {
+    const user = userEvent.setup();
+
+    const { dispatchSpy } = renderWithStore(
+      <MemoryRouter>
+        <Header />
+      </MemoryRouter>,
+      commonOption,
+    );
+
+    const homeButton = screen.getByRole("button", { name: "ホームへ戻る" });
+    expect(homeButton).toBeInTheDocument();
+    await user.click(homeButton);
+
+    expect(mockNavigate).toHaveBeenCalledWith("/");
+
+    expect(dispatchSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "quizContent/resetQuizContent",
+      }),
+    );
+    expect(dispatchSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "quizSettings/resetQuizSettings",
+      }),
+    );
+  });
+  test("ヒストリーアイコンをクリックすると ヒストリーページへ戻る", async () => {
+    const user = userEvent.setup();
+
+    renderWithStore(
+      <MemoryRouter>
+        <Header />
+      </MemoryRouter>,
+      commonOption,
+    );
+
+    const historyButton = screen.getByRole("button", {
+      name: "クイズの記録を見る",
+    });
+    expect(historyButton).toBeInTheDocument();
+    await user.click(historyButton);
+
+    expect(mockNavigate).toHaveBeenCalledWith("/quiz/history");
+  });
+
+  test("履歴ページにいる時 履歴アイコンがActiveになり ホームアイコンはならない", () => {
+    renderWithStore(
+      <MemoryRouter initialEntries={["/quiz/history"]}>
+        <Header />
+      </MemoryRouter>,
+      commonOption,
+    );
+
+    const homeButton = screen.getByRole("button", { name: "ホームへ戻る" });
+    const historyButton = screen.getByRole("button", {
+      name: "クイズの記録を見る",
+    });
+
+    expect(historyButton).toHaveClass("active");
+    expect(homeButton).not.toHaveClass("active");
+  });
+  test("クイズページにいる時 履歴アイコン ホームアイコンともにActiveにならない", () => {
+    renderWithStore(
+      <MemoryRouter initialEntries={["/quiz/play"]}>
+        <Header />
+      </MemoryRouter>,
+      commonOption,
+    );
+
+    const homeButton = screen.getByRole("button", { name: "ホームへ戻る" });
+    const historyButton = screen.getByRole("button", {
+      name: "クイズの記録を見る",
+    });
+
+    expect(historyButton).not.toHaveClass("active");
+    expect(homeButton).not.toHaveClass("active");
   });
 });

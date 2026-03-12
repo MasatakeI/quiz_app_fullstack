@@ -1,7 +1,7 @@
 // src/redux/features/quizProgress/quizProgressSlice.js
 
 import { createSlice } from "@reduxjs/toolkit";
-import { judgeCorrectAnswer } from "../../../models/QuizModel";
+import { judgeCorrectAnswer } from "@/models/QuizModel";
 import { fetchQuizzesAsync } from "../quizContent/quizContentThunks";
 import { resetQuizContent } from "../quizContent/quizContentSlice";
 

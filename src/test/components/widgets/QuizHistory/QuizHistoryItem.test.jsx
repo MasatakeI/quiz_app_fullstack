@@ -11,6 +11,17 @@ describe("QuizHistoryItem", () => {
     vi.clearAllMocks();
   });
 
+  test("Propsが未定義の場合、デフォルト値が適用されて正しく描画される（カバレッジ補完）", () => {
+    render(<QuizHistoryItem />);
+
+    expect(screen.getByText(QUIZ_TITLE_MAP["general"])).toBeInTheDocument();
+
+    expect(screen.getByText(DIFFICULTY_LABELS["easy"])).toBeInTheDocument();
+
+    expect(screen.getByText(TYPE_LABELS["multiple"])).toBeInTheDocument();
+    expect(screen.getByText("0%")).toBeInTheDocument();
+  });
+
   test("必要なデータが描画され 削除ボタンを押したとき 対応する関数が呼ばれる", async () => {
     const user = userEvent.setup();
     const onDelete = vi.fn();
@@ -69,7 +80,14 @@ describe("QuizHistoryItem", () => {
   ])(
     "正解率 $accuracy が $expected に変換されること",
     ({ accuracy, expected }) => {
-      render(<QuizHistoryItem historyAccuracy={accuracy} />);
+      render(
+        <QuizHistoryItem
+          historyAccuracy={accuracy}
+          historyCategory="sports" // ダミーの有効なキーを渡す
+          historyType="multiple"
+          historyDifficulty="easy"
+        />,
+      );
       expect(screen.getByText(expected)).toBeInTheDocument();
     },
   );

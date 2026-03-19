@@ -3,6 +3,7 @@ import {
   addHistoryAsync,
   fetchHistoriesAsync,
   deleteHistoryAsync,
+  deleteHistoriesAsync,
 } from "./quizHistoryThunks";
 
 export const quizHistoryInitialState = {
@@ -41,18 +42,37 @@ const quizHistorySlice = createSlice({
         state.error = null;
       })
 
-      //deleteHistory
+      //delete系pending共通処理
+      .addMatcher(
+        (action) =>
+          [
+            deleteHistoryAsync.pending.type,
+            deleteHistoriesAsync.pending.type,
+          ].includes(action.type),
+        (state) => {
+          state.isDeleting = true;
+        },
+      )
+      //delete系 fulfilled 共通処理
+      .addMatcher(
+        (action) =>
+          [
+            deleteHistoryAsync.fulfilled.type,
+            deleteHistoriesAsync.fulfilled.type,
+          ].includes(action.type),
+        (state, action) => {
+          state.isDeleting = false;
 
-      .addCase(deleteHistoryAsync.pending, (state) => {
-        state.isDeleting = true;
-      })
-      .addCase(deleteHistoryAsync.fulfilled, (state, action) => {
-        state.isDeleting = false;
-        state.histories = state.histories.filter((his) => {
-          return his.id !== action.payload.id;
-        });
-        state.error = null;
-      })
+          const deleteIds = Array.isArray(action.payload)
+            ? action.payload
+            : [action.payload];
+          state.histories = state.histories.filter((his) => {
+            return !deleteIds.includes(his.id);
+          });
+
+          state.error = null;
+        },
+      )
 
       //rejected共通処理
       .addMatcher(

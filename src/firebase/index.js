@@ -15,5 +15,5 @@ const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 
-const db = getFirestore(app);
+export const db = getFirestore(app);
 export const quizHistoryRef = collection(db, "histories");

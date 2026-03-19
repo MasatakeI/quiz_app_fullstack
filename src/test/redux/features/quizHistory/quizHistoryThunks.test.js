@@ -39,19 +39,23 @@ const SUCCESS_CASES = [
   {
     title: "addHistoryAsync",
     condition: { canPost: true },
+    authState: { user: { uid: "@@@" } },
+
     mockFn: addHistory,
-    arg: mockNewQuizHistory,
+    arg: ["@@@", { userId: "@@@", ...mockNewQuizHistory }],
     thunk: addHistoryAsync,
     params: { resultData: mockNewQuizHistory },
     expected: mockNewQuizHistory,
     type: "quizHistory/addHistory/fulfilled",
-    snackbarMessage: "クイズ結果を保存しました",
+    snackbarMessage: "クラウドに結果を保存しました",
   },
   {
     title: "fetchHistoriesAsync",
     condition: { isLoading: false },
+    authState: { user: { uid: "@@@" } },
+
     mockFn: fetchHistories,
-    arg: undefined,
+    arg: "@@@",
     thunk: fetchHistoriesAsync,
     params: undefined,
     expected: mockQuizHistories,
@@ -61,6 +65,8 @@ const SUCCESS_CASES = [
   {
     title: "deleteHistoryAsync",
     condition: { isDeleting: false },
+    authState: { user: { uid: "@@@" } },
+
     mockFn: deleteHistory,
     arg: mockQuizHistories[0].id,
     thunk: deleteHistoryAsync,
@@ -75,6 +81,7 @@ const FAILED_MODEL_FUNCTION_CASE = [
   {
     title: "addHistoryAsync",
     condition: { canPost: true },
+    authState: { user: { uid: "@@@" } },
     mockFn: addHistory,
     thunk: addHistoryAsync,
     params: { resultData: mockNewQuizHistory },
@@ -83,6 +90,7 @@ const FAILED_MODEL_FUNCTION_CASE = [
   {
     title: "fetchHistoriesAsync",
     condition: { isLoading: false },
+    authState: { user: { uid: "@@@" } },
 
     mockFn: fetchHistories,
     thunk: fetchHistoriesAsync,
@@ -92,7 +100,6 @@ const FAILED_MODEL_FUNCTION_CASE = [
   {
     title: "deleteHistoryAsync",
     condition: { isDeleting: false },
-
     mockFn: deleteHistory,
     thunk: deleteHistoryAsync,
     params: { id: mockQuizHistories[0].id },
@@ -106,6 +113,15 @@ const FAILED_OPTIONS_CASE = [
     thunk: addHistoryAsync,
     params: { resultData: mockNewQuizHistory },
     condition: { canPost: false },
+    authState: { user: { uid: "@@@" } },
+  },
+  {
+    title: "addHistoryAsync (ログインしていない場合)",
+    mockFn: addHistory,
+    thunk: addHistoryAsync,
+    params: { resultData: mockNewQuizHistory },
+    condition: { canPost: true },
+    authState: { user: null },
   },
   {
     title: "fetchHistoriesAsync",
@@ -113,6 +129,15 @@ const FAILED_OPTIONS_CASE = [
     thunk: fetchHistoriesAsync,
     params: undefined,
     condition: { isLoading: true },
+    authState: { user: { uid: "@@@" } },
+  },
+  {
+    title: "fetchHistoriesAsync(ログインしていない場合は配列を返す)",
+    mockFn: fetchHistories,
+    thunk: fetchHistoriesAsync,
+    params: undefined,
+    condition: { isLoading: false },
+    authState: { user: null },
   },
   {
     title: "deleteHistoryAsync",
@@ -133,6 +158,7 @@ describe("quizHistoryThunks", () => {
       "$title",
       async ({
         condition,
+        authState,
         mockFn,
         arg,
         thunk,
@@ -143,6 +169,7 @@ describe("quizHistoryThunks", () => {
       }) => {
         getState.mockReturnValue({
           quizHistory: condition,
+          auth: authState,
         });
 
         mockSuccess(mockFn, expected);
@@ -152,6 +179,8 @@ describe("quizHistoryThunks", () => {
 
         if (arg === undefined) {
           expect(mockFn).toHaveBeenCalledTimes(1);
+        } else if (Array.isArray(arg)) {
+          expect(mockFn).toHaveBeenCalledWith(...arg);
         } else {
           expect(mockFn).toHaveBeenCalledWith(arg);
         }
@@ -170,9 +199,10 @@ describe("quizHistoryThunks", () => {
   describe("異常系共通処理:mockFnが失敗したとき rejected状態になる", () => {
     test.each(FAILED_MODEL_FUNCTION_CASE)(
       "$title",
-      async ({ condition, mockFn, thunk, params, type }) => {
+      async ({ condition, mockFn, thunk, params, type, authState }) => {
         getState.mockReturnValue({
           quizHistory: condition,
+          auth: authState,
         });
 
         const error = {
@@ -195,15 +225,21 @@ describe("quizHistoryThunks", () => {
   describe("異常系共通処理:condition=falseの時 処理を実行しない", () => {
     test.each(FAILED_OPTIONS_CASE)(
       "$title",
-      async ({ mockFn, thunk, params, condition }) => {
+      async ({ mockFn, thunk, params, condition, authState }) => {
         getState.mockReturnValue({
           quizHistory: condition,
+          auth: authState || { user: { uid: "@@@" } },
         });
 
         const result = await callThunk(thunk, params);
 
-        expect(mockFn).not.toHaveBeenCalled();
-        expect(result.meta.condition).toBe(true);
+        if (thunk === fetchHistoriesAsync && authState?.user === null) {
+          expect(result.payload).toEqual([]);
+          expect(mockFn).not.toHaveBeenCalled();
+        } else {
+          expect(mockFn).not.toHaveBeenCalled();
+          expect(result.meta.condition).toBe(true);
+        }
       },
     );
   });

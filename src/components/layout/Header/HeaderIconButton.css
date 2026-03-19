@@ -19,3 +19,24 @@
   color: #1b2f4a;
   background-color: #fff;
 }
+
+.button-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-name-text {
+  font-size: 0.9rem;
+  font-weight: 500;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .user-name-text {
+    display: none;
+  }
+}

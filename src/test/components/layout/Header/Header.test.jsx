@@ -16,6 +16,7 @@ import quizSettingsReducer, {
 import quizHistoryReducer, {
   quizHistoryInitialState,
 } from "@/redux/features/quizHistory/quizHistorySlice";
+import authReducer, { authInitialState } from "@/redux/features/auth/authSlice";
 
 import userEvent from "@testing-library/user-event";
 import { act } from "react";
@@ -42,12 +43,14 @@ describe("Header", () => {
       quizProgress: quizProgressReducer,
       quizSettings: quizSettingsReducer,
       quizHistory: quizHistoryReducer,
+      auth: authReducer,
     },
     preloadedState: {
       quizContent: { ...contentInitialState },
       quizProgress: { ...progressInitialState },
       quizSettings: { ...settingsInitialState },
       quizHistory: { ...quizHistoryInitialState },
+      auth: { ...authInitialState },
     },
   };
 
@@ -171,6 +174,50 @@ describe("Header", () => {
     await user.click(historyButton);
 
     expect(mockNavigate).toHaveBeenCalledWith("/quiz/history");
+  });
+
+  test("未ログイン時:ログインボタンをクリックすると AuthModalが開く", async () => {
+    const user = userEvent.setup();
+
+    const { dispatchSpy } = renderWithStore(
+      <MemoryRouter>
+        <Header />
+      </MemoryRouter>,
+      commonOption,
+    );
+
+    const loginButton = screen.getByRole("button", {
+      name: "ログイン",
+    });
+    expect(loginButton).toBeInTheDocument();
+    await user.click(loginButton);
+
+    expect(dispatchSpy).toHaveBeenCalledWith({ type: "auth/openAuthModal" });
+  });
+
+  test("ログイン時:ログアウトボタンをクリックすると ログアウトしホームページに遷移する", async () => {
+    const user = userEvent.setup();
+
+    renderWithStore(
+      <MemoryRouter>
+        <Header />
+      </MemoryRouter>,
+      {
+        ...commonOption,
+        preloadedState: {
+          ...commonOption.preloadedState,
+          auth: { ...authInitialState, user: { uid: "@@@" } },
+        },
+      },
+    );
+
+    const logoutButton = screen.getByRole("button", {
+      name: "ログアウト",
+    });
+    expect(logoutButton).toBeInTheDocument();
+    await user.click(logoutButton);
+
+    expect(mockNavigate).toHaveBeenCalledWith("/");
   });
 
   test("履歴ページにいる時 履歴アイコンがActiveになり ホームアイコンはならない", () => {

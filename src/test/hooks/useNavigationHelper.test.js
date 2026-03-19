@@ -17,6 +17,8 @@ import quizSettingsReducer, {
 import quizHistoryReducer, {
   quizHistoryInitialState,
 } from "@/redux/features/quizHistory/quizHistorySlice";
+import authReducer, { authInitialState } from "@/redux/features/auth/authSlice";
+
 import { act } from "@testing-library/react";
 
 const mockNavigate = vi.fn();
@@ -39,12 +41,14 @@ describe("useNavigationHelper", () => {
       quizProgress: quizProgressReducer,
       quizSettings: quizSettingsReducer,
       quizHistory: quizHistoryReducer,
+      auth: authReducer,
     },
     preloadedState: {
       quizContent: { ...contentInitialState },
       quizProgress: { ...progressInitialState },
       quizSettings: { ...settingsInitialState },
       quizHistory: { ...quizHistoryInitialState },
+      auth: { ...authInitialState },
     },
   };
 
@@ -163,7 +167,7 @@ describe("useNavigationHelper", () => {
               ],
             },
           },
-          initialPath: "quiz/history",
+          initialPath: "/quiz/history",
         });
 
         await act(async () => {
@@ -211,7 +215,7 @@ describe("useNavigationHelper", () => {
               ],
             },
           },
-          initialPath: "quiz/history",
+          initialPath: "/quiz/history",
         });
 
         await act(async () => {

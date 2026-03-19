@@ -1,30 +1,33 @@
 //src/components/widgets/QuizHistory/QuizHistory.jsx
 
-import React, { useState } from "react";
+import React from "react";
 import "./QuizHistory.css";
 
-import QuizHistoryItem from "./QuizHistoryItem";
 import Button from "@/components/common/Button/Button";
 import DeleteModal from "@/components/common/DeleteModal/DeleteModal";
 
-import { useDispatch, useSelector } from "react-redux";
-import { selectAllHistories } from "@/redux/features/quizHistory/quizHistorySelector";
-import { deleteHistoryAsync } from "@/redux/features/quizHistory/quizHistoryThunks";
-
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
-
 import { useNavigationHelper } from "@/hooks/useNavigationHelper";
+import { useQuizHistory } from "./useQuizHistory";
+import QuizHistoryView from "./QuizHistoryView";
+import CheckContainer from "./CheckContainer";
 
 const QuizHistory = () => {
-  const dispatch = useDispatch();
-
-  const histories = useSelector(selectAllHistories);
-
   const { handleGoHome, handleRetryFromHistory } = useNavigationHelper();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [targetId, setTargetId] = useState(null);
+  const {
+    histories,
+    label,
+    selectedIds,
+    isModalOpen,
+    setIsModalOpen,
+    modalTitle,
+    targetId,
+    handleToggleSelectAll,
+    openDeleteModal,
+    handleSelect,
+    handleBulkDelete,
+    handleSingleDelete,
+  } = useQuizHistory();
 
   if (histories.length === 0) {
     return (
@@ -39,45 +42,30 @@ const QuizHistory = () => {
   return (
     <div>
       <h1 className="title">クイズの記録</h1>
+      <CheckContainer
+        label={label}
+        histories={histories}
+        selectedIds={selectedIds}
+        handleOnChange={handleToggleSelectAll}
+        handleModalOpen={openDeleteModal}
+      />
 
-      <Box sx={{ flexGrow: 1 }} className="history-container">
-        <Grid container spacing={2}>
-          {histories.map((his) => {
-            return (
-              <Grid
-                key={his.id}
-                className="history-list"
-                size={{ xs: 12, md: 6 }}
-              >
-                <QuizHistoryItem
-                  historyDate={his.date}
-                  historyCategory={his.category}
-                  historyType={his.type}
-                  historyScore={his.score}
-                  historyTotalQuestions={his.totalQuestions}
-                  historyAccuracy={his.accuracy}
-                  historyDifficulty={his.difficulty}
-                  onDelete={() => {
-                    setIsModalOpen(true);
-                    setTargetId(his.id);
-                  }}
-                  onRetry={() => handleRetryFromHistory(his.id)}
-                />
-              </Grid>
-            );
-          })}
-        </Grid>
-      </Box>
+      <QuizHistoryView
+        histories={histories}
+        onRetry={handleRetryFromHistory}
+        onDelete={openDeleteModal}
+        onSelect={handleSelect}
+        selectedIds={selectedIds}
+      />
 
       <DeleteModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={"この記録を削除しますか?"}
-        onConfirm={() => {
-          dispatch(deleteHistoryAsync({ id: targetId }));
-          setIsModalOpen(false);
-          setTargetId(null);
-        }}
+        title={modalTitle}
+        onConfirm={targetId ? handleSingleDelete : handleBulkDelete}
+        message={
+          selectedIds.length > 0 ? `${selectedIds.length}件 を削除します` : ""
+        }
         confirmTitle={"削除"}
       />
     </div>

@@ -10,6 +10,7 @@ import { useHomePage } from "./useHomePage";
 
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
+import Footer from "@/components/layout/Footer/Footer";
 
 const HomePage = () => {
   const { items, handleStart } = useHomePage();
@@ -39,6 +40,8 @@ const HomePage = () => {
       <div className="quiz-start-button">
         <Button onClickHandler={handleStart}>クイズスタート</Button>
       </div>
+
+      <Footer />
     </div>
   );
 };

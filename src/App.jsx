@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import "./App.css";
 
 import Header from "@/components/layout/Header/Header";
-import Footer from "@/components/layout/Footer/Footer";
 import AppRoutes from "./AppRoutes";
 import SimpleSnackbar from "./components/common/SimpleSnackbar/SimpleSnackbar";
 import AuthForm from "./components/widgets/AuthForm/AuthForm";
@@ -64,7 +63,6 @@ const App = () => {
       <div className="app-container">
         <AppRoutes />
       </div>
-      <Footer />
 
       <SimpleSnackbar
         isOpen={snackbarOpen}

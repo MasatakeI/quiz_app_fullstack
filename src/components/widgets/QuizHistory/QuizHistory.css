@@ -3,3 +3,11 @@
   margin-top: 20px;
   padding: 0;
 }
+
+.buld-action-bar {
+  transform: scale(1.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}

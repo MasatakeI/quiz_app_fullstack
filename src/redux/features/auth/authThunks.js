@@ -11,7 +11,7 @@ import {
   signInAnonymouslyUser,
 } from "@/models/AuthModel";
 import { mapAuthError } from "@/models/errors/auth/mapAuthError";
-import { clearUser, setAuthChecked, setUser } from "./authSlice";
+import { clearUser, setIsAuthChecked, setUser } from "./authSlice";
 
 export const initAuthAsync = () => (dispatch) => {
   const unsubscribe = subscribeAuth((user) => {
@@ -21,7 +21,7 @@ export const initAuthAsync = () => (dispatch) => {
       dispatch(clearUser());
     }
 
-    dispatch(setAuthChecked());
+    dispatch(setIsAuthChecked());
   });
 
   return unsubscribe;

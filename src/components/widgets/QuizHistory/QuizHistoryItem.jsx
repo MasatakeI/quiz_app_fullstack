@@ -2,8 +2,8 @@ import React from "react";
 
 import "./QuizHistoryItem.css";
 import IconButton from "@/components/common/IconButton/IconButton";
-
-import { faArrowsRotate, faTrash } from "@fortawesome/free-solid-svg-icons";
+import Checkbox from "@mui/material/Checkbox";
+import { faRotateLeft, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { DIFFICULTY_LABELS, TYPE_LABELS } from "@/constants/quizTranslations";
 import { QUIZ_TITLE_MAP } from "@/constants/quizCategories";
 
@@ -15,18 +15,29 @@ const QuizHistoryItem = ({
   historyTotalQuestions = 0,
   historyAccuracy = 0,
   historyDifficulty = "easy",
+
+  id,
+  isSelected,
+  onSelect = () => {},
   onDelete = () => {},
   onRetry = () => {},
 }) => {
+  const label = { slotProps: { input: { "aria-label": "Checkbox demo" } } };
+
   return (
     <div className="history-card">
       <div className="history-header">
+        <Checkbox
+          {...label}
+          checked={isSelected}
+          onChange={() => onSelect(id)}
+        />
         <span className="history-date">{historyDate}</span>
         <div>
           <IconButton
             title="同じ条件で再挑戦"
             onClick={onRetry}
-            icon={faArrowsRotate}
+            icon={faRotateLeft}
           />
           <IconButton
             title="削除"

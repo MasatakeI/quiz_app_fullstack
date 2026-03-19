@@ -20,7 +20,7 @@ import { AuthError } from "@/models/errors/auth/AuthError";
 import { AUTH_ERROR_CODE } from "@/models/errors/auth/authErrorCode";
 import {
   clearUser,
-  setAuthChecked,
+  setIsAuthChecked,
   setUser,
 } from "@/redux/features/auth/authSlice";
 
@@ -56,7 +56,7 @@ describe("authThunks", () => {
   const mockUser = { email, password };
 
   describe("initUserAsync", () => {
-    test("認証状態が変化した時に setUserとsetAuthCheckedが dispatchされる", async () => {
+    test("認証状態が変化した時に setUserと setIsAuthCheckedが dispatchされる", async () => {
       let authCallback;
 
       subscribeAuth.mockImplementation((cb) => {
@@ -68,7 +68,7 @@ describe("authThunks", () => {
       authCallback(mockUser);
 
       expect(dispatch).toHaveBeenCalledWith(setUser(mockUser));
-      expect(dispatch).toHaveBeenCalledWith(setAuthChecked());
+      expect(dispatch).toHaveBeenCalledWith(setIsAuthChecked());
 
       authCallback(null);
 

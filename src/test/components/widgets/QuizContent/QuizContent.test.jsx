@@ -6,6 +6,7 @@ import { describe, test, vi, expect, beforeEach } from "vitest";
 import QuizContent from "@/components/widgets/QuizContent/QuizContent";
 
 import { renderWithStore } from "@/test/utils/renderWithStore";
+
 import quizProgressReducer, {
   progressInitialState,
 } from "@/redux/features/quizProgress/quizProgressSlice";
@@ -18,6 +19,8 @@ import quizSettingsReducer, {
 import quizHistoryReducer, {
   quizHistoryInitialState,
 } from "@/redux/features/quizHistory/quizHistorySlice";
+import authReducer, { authInitialState } from "@/redux/features/auth/authSlice";
+
 import userEvent from "@testing-library/user-event";
 
 const mockNavigate = vi.fn();
@@ -47,6 +50,7 @@ describe("QuizContent.jsxのテスト", () => {
       quizProgress: quizProgressReducer,
       quizSettings: quizSettingsReducer,
       quizHistory: quizHistoryReducer,
+      auth: authReducer,
     },
     preloadedState: {
       quizContent: {
@@ -70,6 +74,7 @@ describe("QuizContent.jsxのテスト", () => {
       quizProgress: { ...progressInitialState },
       quizSettings: { ...settingsInitialState },
       quizHistory: { ...quizHistoryInitialState },
+      auth: { ...authInitialState },
     },
   };
 

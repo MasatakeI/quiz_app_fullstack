@@ -20,6 +20,7 @@ import {
   query,
   orderBy,
   doc,
+  where,
 } from "firebase/firestore";
 
 import { QuizHistoryError } from "@/models/errors/quizHistory/quizHistoryError";
@@ -34,6 +35,7 @@ vi.mock("firebase/firestore", () => ({
   serverTimestamp: vi.fn(() => () => "server-timestamp-placeholder"),
   orderBy: vi.fn(),
   doc: vi.fn(),
+  where: vi.fn(),
 
   getFirestore: vi.fn(),
   collection: vi.fn(),
@@ -103,8 +105,8 @@ describe("QuizHistoryModel", () => {
   describe("addHistory", () => {
     test("正常系:クイズ結果を保存し 保存した結果を返す", async () => {
       mockAddHistorySuccess();
-
-      const result = await addHistory(newHistoryInput);
+      const userId = "aaabbb";
+      const result = await addHistory(userId, newHistoryInput);
 
       expect(result).toEqual(expectHistory(newHistory));
 
@@ -119,7 +121,7 @@ describe("QuizHistoryModel", () => {
     describe("異常系:", () => {
       test.each([
         {
-          title: "スコアがundefined",
+          title: "スコアが !number",
           setup: () => {},
           resultData: {},
           code: QUIZ_HISTORY_ERROR_CODE.VALIDATION,
@@ -160,8 +162,8 @@ describe("QuizHistoryModel", () => {
         },
       ])("$title", async ({ setup, resultData, code, message }) => {
         setup?.();
-
-        await expect(addHistory(resultData)).rejects.toEqual(
+        const userId = "aaabbb";
+        await expect(addHistory(userId, resultData)).rejects.toEqual(
           expect.objectContaining({
             code,
             message,
@@ -191,10 +193,11 @@ describe("QuizHistoryModel", () => {
       const result = await fetchHistories();
       expect(result).toHaveLength(2);
       expect(result[0]).toEqual(expectHistory(newHistory));
-
+      const userId = "aaabbb";
       expect(query).toHaveBeenCalledWith(
         "mock-collection-ref",
         orderBy("date", "desc"),
+        where("userId", "==", userId),
       );
 
       expect(orderBy).toHaveBeenCalledWith("date", "desc");
@@ -206,8 +209,8 @@ describe("QuizHistoryModel", () => {
       getDocs.mockResolvedValue({
         docs: [],
       });
-
-      const result = await fetchHistories();
+      const userId = "aaabbb";
+      const result = await fetchHistories(userId);
       expect(result).toEqual([]);
     });
 

@@ -2,7 +2,6 @@
 
 import {
   addDoc,
-  deleteDoc,
   getDoc,
   getDocs,
   query,
@@ -10,45 +9,37 @@ import {
   orderBy,
   doc,
   where,
+  writeBatch,
 } from "firebase/firestore";
 
+import { quizHistoryRef, db } from "@/firebase";
 import { QuizHistoryError } from "./errors/quizHistory/quizHistoryError";
-import { quizHistoryRef } from "@/firebase";
 import { QUIZ_HISTORY_ERROR_CODE } from "./errors/quizHistory/quizHistoryErrorCode";
 import { mapQuizHistoryError } from "./errors/quizHistory/mapQuizHistoryError";
 
 import { format } from "date-fns";
 
 export const createHistory = (id, data) => {
-  // if (
-  //   !data ||
-  //   // typeof data.category !== "string" ||
-  //   typeof data.difficulty !== "string" ||
-  //   typeof data.score !== "number" ||
-  //   typeof data.totalQuestions !== "number" ||
-  //   typeof data.date?.toDate !== "function"
-  // ) {
-  //   throw new QuizHistoryError({
-  //     code: QUIZ_HISTORY_ERROR_CODE.INVALID_DATA,
-  //     message: "無効なデータです",
-  //   });
-  // }
+  const isValid =
+    data &&
+    typeof data.difficulty === "string" &&
+    typeof data.score === "number" &&
+    typeof data.totalQuestions === "number" &&
+    data.date; // 存在だけ確認（toDateの有無は後で判定）
 
-  console.log("Checking data for ID:", id, data); // これで中身を全出しする
-
-  if (!data || !data.date) {
-    console.error("Data or Date is missing for ID:", id);
+  if (!isValid) {
     throw new QuizHistoryError({
       code: QUIZ_HISTORY_ERROR_CODE.INVALID_DATA,
       message: "無効なデータです",
     });
   }
 
-  // toDateが存在するか安全に確認
-  const timestamp = data.date.toDate ? data.date.toDate() : new Date(data.date);
+  // 2. 日付の変換（Firebase Timestamp か 通常の Date/String かを判定）
+  const timestamp =
+    typeof data.date.toDate === "function"
+      ? data.date.toDate()
+      : new Date(data.date);
   const dateObj = format(timestamp, "yyyy/MM/dd HH:mm");
-
-  // const dateObj = format(data.date.toDate(), "yyyy/MM/dd HH:mm");
 
   return {
     id,
@@ -122,25 +113,21 @@ export const fetchHistories = async (userId) => {
   }
 };
 
-export const deleteHistory = async (id) => {
+export const performDelete = async (ids) => {
+  if (!ids || ids.length === 0) return [];
+
   try {
-    const docRef = doc(quizHistoryRef, id);
-    const snapShot = await getDoc(docRef);
-
-    if (!snapShot.exists()) {
-      throw new QuizHistoryError({
-        code: QUIZ_HISTORY_ERROR_CODE.NOT_FOUND,
-        message: "削除対象のデータが見つかりませんでした",
-      });
-    }
-
-    const data = snapShot.data();
-    const model = createHistory(docRef.id, data);
-
-    await deleteDoc(docRef);
-
-    return model;
+    const batch = writeBatch(db);
+    ids.forEach((id) => {
+      const docRef = doc(quizHistoryRef, id);
+      batch.delete(docRef);
+    });
+    await batch.commit();
+    return ids;
   } catch (error) {
     throw mapQuizHistoryError(error);
   }
 };
+
+export const deleteHistory = (id) => performDelete([id]);
+export const deleteHistories = (ids) => performDelete(ids);

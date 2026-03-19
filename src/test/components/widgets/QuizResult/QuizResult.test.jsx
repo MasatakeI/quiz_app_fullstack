@@ -19,6 +19,7 @@ import quizSettingsReducer, {
 import quizHistoryReducer, {
   quizHistoryInitialState,
 } from "@/redux/features/quizHistory/quizHistorySlice";
+import authReducer, { authInitialState } from "@/redux/features/auth/authSlice";
 
 import userEvent from "@testing-library/user-event";
 
@@ -43,6 +44,12 @@ vi.mock("react-router", () => {
   };
 });
 
+vi.mock("@/models/QuizHistoryModel", () => ({
+  addHistory: vi.fn().mockResolvedValue({ id: "mock-id", date: "2024/01/01" }),
+  fetchHistories: vi.fn().mockResolvedValue([]),
+  deleteHistory: vi.fn().mockResolvedValue({}),
+}));
+
 describe("QuizResult.jsxのテスト", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -54,6 +61,7 @@ describe("QuizResult.jsxのテスト", () => {
       quizProgress: quizProgressReducer,
       quizSettings: quizSettingsReducer,
       quizHistory: quizHistoryReducer,
+      auth: authReducer,
     },
     preloadedState: {
       quizContent: {
@@ -84,35 +92,72 @@ describe("QuizResult.jsxのテスト", () => {
         category: "sports",
       },
       quizHistory: { ...quizHistoryInitialState },
+      auth: { ...authInitialState },
     },
   };
 
-  test("子コンポーネントが描写される", async () => {
-    renderWithStore(<QuizResult />, commonOptions);
+  describe("子コンポーネントが描写される", () => {
+    test("未ログイン時", async () => {
+      renderWithStore(<QuizResult />, commonOptions);
 
-    //QuizResultVies.jsx
-    // デザイン変更で「スポーツ クイズ結果」になっても通るようにする
-    expect(await screen.findByText(/スポーツ.*結果/)).toBeInTheDocument();
-    //ResultSummary.jsx
-    expect(screen.getByTestId("result-summary")).toBeInTheDocument();
+      //QuizResultVies.jsx
+      // デザイン変更で「スポーツ クイズ結果」になっても通るようにする
+      expect(await screen.findByText(/スポーツ.*結果/)).toBeInTheDocument();
+      //ResultSummary.jsx
+      expect(screen.getByTestId("result-summary")).toBeInTheDocument();
 
-    const goHomeButtons = screen.getAllByRole("button", {
-      name: "ホームへ戻る",
+      const goHomeButtons = screen.getAllByRole("button", {
+        name: "ホームへ戻る",
+      });
+      const retryButtons = screen.getAllByRole("button", {
+        name: "同じ条件でもう1度",
+      });
+
+      const historyButtons = screen.getAllByRole("button", {
+        name: "ログインして保存",
+      });
+
+      expect(goHomeButtons[0]).toBeInTheDocument();
+      expect(goHomeButtons).toHaveLength(2);
+      expect(retryButtons[0]).toBeInTheDocument();
+      expect(retryButtons).toHaveLength(2);
+      expect(historyButtons[0]).toBeInTheDocument();
+      expect(historyButtons).toHaveLength(2);
     });
-    const retryButtons = screen.getAllByRole("button", {
-      name: "同じ条件でもう1度",
-    });
 
-    const historyButtons = screen.getAllByRole("button", {
-      name: "記録を見る",
-    });
+    test("ログイン時", async () => {
+      renderWithStore(<QuizResult />, {
+        ...commonOptions,
+        preloadedState: {
+          ...commonOptions.preloadedState,
+          auth: { user: "@@@" },
+        },
+      });
 
-    expect(goHomeButtons[0]).toBeInTheDocument();
-    expect(goHomeButtons).toHaveLength(2);
-    expect(retryButtons[0]).toBeInTheDocument();
-    expect(retryButtons).toHaveLength(2);
-    expect(historyButtons[0]).toBeInTheDocument();
-    expect(historyButtons).toHaveLength(2);
+      //QuizResultVies.jsx
+      // デザイン変更で「スポーツ クイズ結果」になっても通るようにする
+      expect(await screen.findByText(/スポーツ.*結果/)).toBeInTheDocument();
+      //ResultSummary.jsx
+      expect(screen.getByTestId("result-summary")).toBeInTheDocument();
+
+      const goHomeButtons = screen.getAllByRole("button", {
+        name: "ホームへ戻る",
+      });
+      const retryButtons = screen.getAllByRole("button", {
+        name: "同じ条件でもう1度",
+      });
+
+      const historyButtons = screen.getAllByRole("button", {
+        name: "記録を見る",
+      });
+
+      expect(goHomeButtons[0]).toBeInTheDocument();
+      expect(goHomeButtons).toHaveLength(2);
+      expect(retryButtons[0]).toBeInTheDocument();
+      expect(retryButtons).toHaveLength(2);
+      expect(historyButtons[0]).toBeInTheDocument();
+      expect(historyButtons).toHaveLength(2);
+    });
   });
 
   test("ホームへ戻るボタンを押すとhandleGoHomeが呼ばれる", async () => {
@@ -153,10 +198,15 @@ describe("QuizResult.jsxのテスト", () => {
     expect(dispatchSpy).toHaveBeenCalledWith(expect.any(Function));
   });
 
-  test("記録を見るボタンを押すと handleGoHistoryが呼ばれる", async () => {
+  test("ログイン時:記録を見るボタンを押すと handleGoHistoryが呼ばれる", async () => {
     const user = userEvent.setup();
-    const { dispatchSpy } = renderWithStore(<QuizResult />, commonOptions);
-
+    const { dispatchSpy } = renderWithStore(<QuizResult />, {
+      ...commonOptions,
+      preloadedState: {
+        ...commonOptions.preloadedState,
+        auth: { user: { uid: "@@@" } },
+      },
+    });
     const historyButtons = screen.getAllByRole("button", {
       name: "記録を見る",
     });
@@ -167,5 +217,19 @@ describe("QuizResult.jsxのテスト", () => {
     }
 
     expect(dispatchSpy).toHaveBeenCalledWith(expect.any(Function));
+  });
+  test("未ログイン時:ログインして保存ボタンを押すと AuthForm が呼ばれる", async () => {
+    const user = userEvent.setup();
+    const { dispatchSpy } = renderWithStore(<QuizResult />, commonOptions);
+
+    const historyButtons = screen.getAllByRole("button", {
+      name: "ログインして保存",
+    });
+
+    for (const button of historyButtons) {
+      await user.click(button);
+    }
+
+    expect(dispatchSpy).toHaveBeenCalledWith({ type: "auth/openAuthModal" });
   });
 });

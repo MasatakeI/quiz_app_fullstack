@@ -19,7 +19,7 @@ const quizContentSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
-      .addCase(fetchQuizzesAsync.pending, (state, action) => {
+      .addCase(fetchQuizzesAsync.pending, (state) => {
         state.isLoading = true;
         state.quizzes = [];
         state.fetchError = null;
@@ -31,7 +31,7 @@ const quizContentSlice = createSlice({
       })
       .addCase(fetchQuizzesAsync.rejected, (state, action) => {
         state.isLoading = false;
-        state.fetchError = action.payload ?? "不明なエラー";
+        state.fetchError = action.payload;
       });
   },
 });

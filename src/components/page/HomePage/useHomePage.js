@@ -56,7 +56,7 @@ export const useHomePage = () => {
           if (v === "boolean") {
             dispatch(updateSettings({ key: "amount", value: 5 }));
           } else {
-            dispatch(updateSettings({ key: "amount", value: amount || 10 }));
+            dispatch(updateSettings({ key: "amount", value: amount }));
           }
         },
         array: types,
@@ -81,7 +81,17 @@ export const useHomePage = () => {
         error: settingError?.field === "amount",
       },
     ],
-    [dispatch, category, type, difficulty, amount, settingError?.field],
+    [
+      dispatch,
+      category,
+      categories,
+      type,
+      difficulty,
+      difficulties,
+      amount,
+      amounts,
+      settingError?.field,
+    ],
   );
 
   const handleStart = () => {

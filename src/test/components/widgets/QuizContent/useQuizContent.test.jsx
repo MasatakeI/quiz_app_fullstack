@@ -14,6 +14,7 @@ import quizSettingsReducer, {
 import quizHistoryReducer, {
   quizHistoryInitialState,
 } from "@/redux/features/quizHistory/quizHistorySlice";
+import authReducer, { authInitialState } from "@/redux/features/auth/authSlice";
 
 import { useQuizContent } from "@/components/widgets/QuizContent/useQuizContent";
 import { renderHookWithStore } from "@/test/utils/renderHookWithStore";
@@ -39,12 +40,14 @@ describe("useQuizContent.js", () => {
       quizProgress: quizProgressReducer,
       quizSettings: quizSettingsReducer,
       quizHistory: quizHistoryReducer,
+      auth: authReducer,
     },
     preloadedState: {
       quizContent: { ...contentInitialState },
       quizProgress: { ...progressInitialState },
       quizSettings: { ...settingsInitialState },
       quizHistory: { ...quizHistoryInitialState },
+      auth: { ...authInitialState },
     },
   };
 

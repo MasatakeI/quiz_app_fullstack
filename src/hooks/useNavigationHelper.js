@@ -1,7 +1,7 @@
 // src/hooks/useNavigationHelper.js
 
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import { resetQuizContent } from "@/redux/features/quizContent/quizContentSlice";
 import {
   resetQuizSettings,
@@ -16,15 +16,26 @@ import { addHistoryAsync } from "@/redux/features/quizHistory/quizHistoryThunks"
 import { selectUser } from "@/redux/features/auth/authSelector";
 import { openAuthModal } from "@/redux/features/auth/authSlice";
 import { signOutUserAsync } from "@/redux/features/auth/authThunks";
+import { fetchQuizzesAsync } from "@/redux/features/quizContent/quizContentThunks";
 
 export const useNavigationHelper = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { category } = useParams();
 
   const histories = useSelector(selectAllHistories);
   const isQuizInProgress = useSelector(selectIsQuizInProgress);
   const resultData = useSelector(selectResultData);
   const user = useSelector(selectUser);
+
+  const [params] = useSearchParams();
+  const type = params.get("type");
+  const difficulty = params.get("difficulty");
+  const amount = params.get("amount");
+
+  const handleRetry = async () => {
+    dispatch(fetchQuizzesAsync({ category, type, difficulty, amount }));
+  };
 
   const confirmNavigation = () => {
     if (isQuizInProgress) {
@@ -46,7 +57,8 @@ export const useNavigationHelper = () => {
 
   const handleGoHistory = () => {
     if (!confirmNavigation()) return;
-
+    dispatch(resetQuizSettings());
+    dispatch(resetQuizContent());
     navigate("/quiz/history");
   };
 
@@ -91,6 +103,7 @@ export const useNavigationHelper = () => {
   };
 
   return {
+    handleRetry,
     handleGoHome,
     handleGoHistory,
     handleRetryFromHistory,

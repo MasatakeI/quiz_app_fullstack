@@ -19,6 +19,8 @@ import quizProgressReducer, {
 import quizContentReducer, {
   contentInitialState,
 } from "@/redux/features/quizContent/quizContentSlice";
+import authReducer, { authInitialState } from "@/redux/features/auth/authSlice";
+
 import { renderWithStore } from "@/test/utils/renderWithStore";
 
 const mockNavigate = vi.fn();
@@ -42,6 +44,7 @@ describe("QuizHistory", () => {
       quizProgress: quizProgressReducer,
       quizSettings: quizSettingsReducer,
       quizHistory: quizHistoryReducer,
+      auth: authReducer,
     },
     preloadedState: {
       quizContent: { ...contentInitialState },
@@ -61,6 +64,7 @@ describe("QuizHistory", () => {
           },
         ],
       },
+      auth: { ...authInitialState },
     },
   };
 

@@ -1,6 +1,6 @@
 //quizSettingsSlice.test.js
 
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { describe, test, expect } from "vitest";
 
 import quizSettingsReducer, {
   settingsInitialState,
@@ -8,15 +8,15 @@ import quizSettingsReducer, {
   resetQuizSettings,
   updateSettings,
   setSettingsError,
-} from "../../../../redux/features/quizSettings/quizSettingsSlice";
+} from "@/redux/features/quizSettings/quizSettingsSlice";
 
 describe("quizSettingsSlice.jsのテスト", () => {
   test("初期stateの確認", () => {
     expect(settingsInitialState).toEqual({
-      category: "",
-      type: "",
-      difficulty: "",
-      amount: "",
+      category: "sports",
+      type: "multiple",
+      difficulty: "easy",
+      amount: "10",
       settingError: { message: "", field: "" },
     });
   });

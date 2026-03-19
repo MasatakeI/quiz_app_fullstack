@@ -19,7 +19,7 @@
   font-size: 2rem;
   font-weight: 700;
   color: #333;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
   position: relative;
   display: inline-block;
 }
@@ -36,24 +36,14 @@
   border-radius: 2px;
 }
 
-/* セレクションセクション（Grid部分） */
 .select-sections {
-  margin-bottom: 3rem !important;
+  margin-bottom: 2rem !important;
 }
 
-/* ボタン周りのレイアウト */
 .quiz-start-button {
-  margin-top: 3rem;
-  /* display: flex;
-  justify-content: center;
-  transition: transform 0.2s ease; */
+  margin: 12px 0 3rem 0;
 }
 
-/* .quiz-start-button:hover {
-  transform: translateY(-3px);
-} */
-
-/* エラーメッセージのラッパー（Snackbarの位置調整が必要な場合） */
 .error-message {
   height: 0;
   overflow: visible;

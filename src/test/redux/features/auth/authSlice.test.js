@@ -5,13 +5,14 @@ import { describe, expect, test, vi, beforeEach } from "vitest";
 import authSlice, {
   clearUser,
   clearAuthError,
-  setAuthChecked,
   setUser,
   authInitialState,
+  openAuthModal,
+  closeAuthModal,
+  setIsAuthChecked,
 } from "@/redux/features/auth/authSlice";
 
 import {
-  signInAnonymouslyUserAsync,
   signInUserAsync,
   signOutUserAsync,
   signUpUserAsync,
@@ -49,6 +50,7 @@ describe("authSlice", () => {
       isLoading: false,
       error: null,
       isAuthChecked: false,
+      isAuthModalOpen: false,
     });
   });
 
@@ -82,13 +84,13 @@ describe("authSlice", () => {
         error: null,
       });
     });
-    test("setAuthChecked:isAuthCheckedをtrueにする", () => {
+    test("setIsAuthChecked:isAuthCheckedをtrueにする", () => {
       const prev = {
         ...authInitialState,
         isAuthChecked: false,
       };
 
-      const action = setAuthChecked();
+      const action = setIsAuthChecked();
 
       const state = authSlice(prev, action);
       expect(state).toEqual({
@@ -104,6 +106,25 @@ describe("authSlice", () => {
         user: mockUser,
       });
     });
+
+    test("openAuthModal:AuthModalを開く", () => {
+      const action = openAuthModal();
+      expect(authSlice(authInitialState, action)).toEqual({
+        ...authInitialState,
+        isAuthModalOpen: true,
+      });
+    });
+    test("closeAuthModal:AuthModalを閉じる", () => {
+      const prev = {
+        ...authInitialState,
+        isAuthModalOpen: true,
+      };
+      const action = closeAuthModal();
+      expect(authSlice(prev, action)).toEqual({
+        ...prev,
+        isAuthModalOpen: false,
+      });
+    });
   });
 
   describe("extraReducers", () => {
@@ -114,11 +135,7 @@ describe("authSlice", () => {
           thunk: signUpUserAsync,
           paylod: mockUser,
         },
-        {
-          title: "signInAnonymouslyUserAsync",
-          thunk: signInAnonymouslyUserAsync,
-          paylod: mockUser,
-        },
+
         {
           title: "signInUserAsync",
           thunk: signInUserAsync,
@@ -142,20 +159,14 @@ describe("authSlice", () => {
     });
 
     test("signOutUserAsync:pendingからfulfilledに遷移し user=nullになる", () => {
-      const pending = applyPending(authSlice, signOutUserAsync);
-      expect(pending).toEqual({
-        ...authInitialState,
-        isLoading: true,
-      });
-
       const fulfilled = applyFulfilled(
         authSlice,
         signOutUserAsync,
         {},
-        pending,
+        authInitialState,
       );
       expect(fulfilled).toEqual({
-        ...pending,
+        ...authInitialState,
         user: null,
       });
     });
@@ -166,17 +177,10 @@ describe("authSlice", () => {
           title: "signUpUserAsync",
           thunk: signUpUserAsync,
         },
-        {
-          title: "signInAnonymouslyUserAsync",
-          thunk: signInAnonymouslyUserAsync,
-        },
+
         {
           title: "signInUserAsync",
           thunk: signInUserAsync,
-        },
-        {
-          title: "signOutUserAsync",
-          thunk: signOutUserAsync,
         },
       ])("$title", ({ thunk }) => {
         const pending = applyPending(authSlice, thunk);

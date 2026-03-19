@@ -55,10 +55,8 @@ const ResultButtonContainer = ({
 
   const visibleButtons = BUTTON_CONFIGS.filter((btn) => {
     if (btn.show === "always") return true;
-    if (btn.show === "loggedIn") return isLoggedIn;
-    if (btn.show === "loggedOut") return !isLoggedIn;
 
-    return true;
+    return btn.show === "loggedIn" ? isLoggedIn : !isLoggedIn;
   });
 
   return (

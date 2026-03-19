@@ -15,6 +15,8 @@ import quizProgressReducer, {
 import quizContentReducer, {
   contentInitialState,
 } from "@/redux/features/quizContent/quizContentSlice";
+import authReducer, { authInitialState } from "@/redux/features/auth/authSlice";
+
 import { renderWithStore } from "@/test/utils/renderWithStore";
 import userEvent from "@testing-library/user-event";
 
@@ -42,6 +44,7 @@ describe("HistoryPage", () => {
       quizProgress: quizProgressReducer,
       quizSettings: quizSettingsReducer,
       quizHistory: quizHistoryReducer,
+      auth: authReducer,
     },
     preloadedState: {
       quizContent: { ...contentInitialState },
@@ -61,89 +64,124 @@ describe("HistoryPage", () => {
           },
         ],
       },
+      auth: { ...authInitialState, user: { uid: "@@@" } },
     },
   };
 
-  test("fetchHistoryAsyncが呼ばれる", () => {
-    const { dispatchSpy } = renderWithStore(<HistoryPage />, commonOptions);
+  describe("ログイン時:", () => {
+    test("fetchHistoryAsyncが呼ばれる", () => {
+      const { dispatchSpy } = renderWithStore(<HistoryPage />, commonOptions);
 
-    expect(dispatchSpy).toHaveBeenCalledWith(expect.any(Function));
+      expect(dispatchSpy).toHaveBeenCalledWith(expect.any(Function));
+    });
+
+    test("isLoading=true の時 LoadingSpinnerが表示される", () => {
+      renderWithStore(<HistoryPage />, {
+        ...commonOptions,
+        preloadedState: {
+          ...commonOptions.preloadedState,
+          quizHistory: {
+            ...commonOptions.preloadedState.quizHistory,
+            isLoading: true,
+          },
+        },
+      });
+
+      expect(screen.getByTestId("loader")).toBeInTheDocument();
+    });
+
+    test("errorがある時 error.messageと 再読み込みボタンが表示される", async () => {
+      const user = userEvent.setup();
+
+      const { dispatchSpy } = renderWithStore(<HistoryPage />, {
+        ...commonOptions,
+        preloadedState: {
+          ...commonOptions.preloadedState,
+          quizHistory: {
+            isLoading: false,
+            error: { message: "エラー" },
+            histories: [{ id: 1, category: "sports" }],
+            canPost: true,
+            isDeleting: false,
+          },
+        },
+      });
+
+      const errorMessage = await screen.findByText(/エラー/);
+      expect(errorMessage).toBeInTheDocument();
+
+      const retryButton = screen.getByRole("button", {
+        name: "履歴再読み込み",
+      });
+      expect(retryButton).toBeInTheDocument();
+
+      await user.click(retryButton);
+
+      expect(dispatchSpy).toHaveBeenCalledTimes(2);
+    });
+
+    test("通常時は QuizHistoryが表示される", async () => {
+      vi.spyOn(historyThunks, "fetchHistoriesAsync").mockReturnValue({
+        type: "none",
+      });
+      renderWithStore(<HistoryPage />, {
+        ...commonOptions,
+        preloadedState: {
+          ...commonOptions.preloadedState,
+          quizHistory: {
+            isLoading: false, // 明示的に false
+            error: null, // エラーもない状態
+            histories: [
+              {
+                id: 1,
+                category: "sports",
+                date: "2020/01/01",
+                score: 3,
+                totalQuestions: 10,
+              },
+            ],
+            canPost: true,
+            isDeleting: false,
+          },
+        },
+      });
+
+      const title = await screen.findByText(
+        "クイズの記録",
+        {},
+        { timeout: 2000 },
+      );
+      expect(title).toBeInTheDocument();
+    });
   });
 
-  test("isLoading=true の時 LoadingSpinnerが表示される", () => {
-    renderWithStore(<HistoryPage />, {
-      ...commonOptions,
-      preloadedState: {
-        ...commonOptions.preloadedState,
-        quizHistory: {
-          ...commonOptions.preloadedState.quizHistory,
-          isLoading: true,
+  describe("非ログイン時", () => {
+    test(" メッセージと ボタンが表示され 対応する関数が呼ばれる", async () => {
+      const user = userEvent.setup();
+      const { dispatchSpy } = renderWithStore(<HistoryPage />, {
+        ...commonOptions,
+        preloadedState: {
+          ...commonOptions.preloadedState,
+          auth: { ...authInitialState, user: null },
         },
-      },
+      });
+
+      const errorMessage = screen.getByText(
+        "履歴を見るには 新規登録 / ログイン してください",
+      );
+      expect(errorMessage).toBeInTheDocument();
+
+      const openModalButton = screen.getByRole("button", {
+        name: "新規登録 / ログイン",
+      });
+      expect(openModalButton).toBeInTheDocument();
+      await user.click(openModalButton);
+      expect(dispatchSpy).toHaveBeenCalledWith({ type: "auth/openAuthModal" });
+
+      const goHomeButton = screen.getByRole("button", { name: "ホームへ戻る" });
+      expect(goHomeButton).toBeInTheDocument();
+      await user.click(goHomeButton);
+      expect(mockNavigate).toHaveBeenCalledWith("/");
     });
-
-    expect(screen.getByTestId("loader")).toBeInTheDocument();
-  });
-
-  test("errorがある時 error.messageと 再読み込みボタンが表示される", async () => {
-    const user = userEvent.setup();
-
-    const { dispatchSpy } = renderWithStore(<HistoryPage />, {
-      ...commonOptions,
-      preloadedState: {
-        ...commonOptions.preloadedState,
-        quizHistory: {
-          isLoading: false,
-          error: { message: "エラー" },
-          histories: [{ id: 1, category: "sports" }],
-          canPost: true,
-          isDeleting: false,
-        },
-      },
-    });
-
-    const errorMessage = await screen.findByText(/エラー/);
-    expect(errorMessage).toBeInTheDocument();
-
-    const retryButton = screen.getByRole("button", { name: "履歴再読み込み" });
-    expect(retryButton).toBeInTheDocument();
-
-    await user.click(retryButton);
-
-    expect(dispatchSpy).toHaveBeenCalledTimes(2);
-  });
-
-  test("通常時は QuizHistoryが表示される", async () => {
-    vi.spyOn(historyThunks, "fetchHistoriesAsync").mockReturnValue({
-      type: "none",
-    });
-    renderWithStore(<HistoryPage />, {
-      ...commonOptions,
-      preloadedState: {
-        ...commonOptions.preloadedState,
-        quizHistory: {
-          isLoading: false, // 明示的に false
-          error: null, // エラーもない状態
-          histories: [
-            {
-              id: 1,
-              category: "sports",
-              date: "2020/01/01",
-              score: 3,
-              totalQuestions: 10,
-            },
-          ],
-          canPost: true,
-          isDeleting: false,
-        },
-      },
-    });
-
-    const title = await screen.findByText(
-      "クイズの記録",
-      {},
-      { timeout: 2000 },
-    );
-    expect(title).toBeInTheDocument();
   });
 });

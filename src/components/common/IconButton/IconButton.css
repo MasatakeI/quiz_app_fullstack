@@ -2,20 +2,23 @@
   border: none;
   background-color: inherit;
   cursor: pointer;
-  color: #a0aec0;
-  transform: scale(0.9);
+  color: #555;
+
+  height: 32px;
+  width: 32px;
   transition: all ease 0.2s;
 }
 
 .icon-button:hover {
-  transform: translateY(-1px);
+  background-color: #eee;
+  border-radius: 50%;
 }
 
 .icon-button.delete:hover {
-  color: #f56565;
-  transform: translateY(-1px);
+  color: #f00;
+  /* color: #f56565; */
 }
 .icon-button.retry:hover {
-  color: #48bb78;
-  transform: translateY(-1px);
+  /* color: #48bb78; */
+  color: #25be65;
 }

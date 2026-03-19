@@ -5,6 +5,7 @@ import {
   addHistory,
   fetchHistories,
   deleteHistory,
+  deleteHistories,
 } from "@/models/QuizHistoryModel";
 import { selectUser } from "../auth/authSelector";
 
@@ -33,6 +34,8 @@ export const addHistoryAsync = createModelThunk(
       if (!auth.user) {
         return false;
       }
+
+      return true;
     },
   },
 );
@@ -42,7 +45,7 @@ export const fetchHistoriesAsync = createModelThunk(
   async (_, thunkApi) => {
     const state = thunkApi.getState();
     const user = selectUser(state);
-    const userId = user.uid;
+    const userId = user?.uid;
 
     if (!userId) return [];
 
@@ -56,17 +59,19 @@ export const fetchHistoriesAsync = createModelThunk(
       if (quizHistory.isLoading) {
         return false;
       }
+
+      return true;
     },
   },
 );
 
 export const deleteHistoryAsync = createModelThunk(
-  "quizHistory/deleteHistory",
+  "quizHistory/delete",
   async ({ id }, thunkApi) => {
-    const targetHistory = await deleteHistory(id);
+    await deleteHistory(id);
 
-    thunkApi.dispatch(showSnackbar(`クイズ結果の削除に成功しました`));
-    return targetHistory;
+    thunkApi.dispatch(showSnackbar(`選択したクイズ結果を削除しました`));
+    return id;
   },
   {
     condition: (_, { getState }) => {
@@ -74,6 +79,27 @@ export const deleteHistoryAsync = createModelThunk(
       if (quizHistory.isDeleting) {
         return false;
       }
+      return true;
+    },
+  },
+);
+export const deleteHistoriesAsync = createModelThunk(
+  "quizHistory/bulkDelete",
+  async ({ ids }, thunkApi) => {
+    await deleteHistories(ids);
+
+    thunkApi.dispatch(
+      showSnackbar(`${ids.length}件のクイズ結果を削除しました`),
+    );
+    return ids;
+  },
+  {
+    condition: (_, { getState }) => {
+      const { quizHistory } = getState();
+      if (quizHistory.isDeleting) {
+        return false;
+      }
+      return true;
     },
   },
 );

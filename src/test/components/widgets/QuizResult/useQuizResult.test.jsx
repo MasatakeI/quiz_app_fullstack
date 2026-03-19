@@ -18,15 +18,16 @@ import quizHistoryReducer, {
   quizHistoryInitialState,
 } from "@/redux/features/quizHistory/quizHistorySlice";
 
+import snackbarReducer, {
+  snackbarInitialState,
+} from "@/redux/features/snackbar/snackbarSlice";
+import authReducer, { authInitialState } from "@/redux/features/auth/authSlice";
+
 import { useQuizResult } from "@/components/widgets/QuizResult/useQuizResult";
 
 import * as quizContentThunks from "@/redux/features/quizContent/quizContentThunks";
 
 import { renderHookWithStore } from "@/test/utils/renderHookWithStore";
-
-import snackbarReducer, {
-  snackbarInitialState,
-} from "@/redux/features/snackbar/snackbarSlice";
 
 const mockNavigate = vi.fn();
 vi.mock("react-router", async () => {
@@ -55,6 +56,7 @@ describe("useQuizResult", () => {
       quizSettings: quizSettingsReducer,
       quizHistory: quizHistoryReducer,
       snackbar: snackbarReducer,
+      auth: authReducer,
     },
     preloadedState: {
       quizContent: { ...contentInitialState },
@@ -62,6 +64,7 @@ describe("useQuizResult", () => {
       quizSettings: { ...settingsInitialState },
       snackbar: { ...snackbarInitialState },
       quizHistory: { ...quizHistoryInitialState },
+      auth: { ...authInitialState },
     },
   };
 

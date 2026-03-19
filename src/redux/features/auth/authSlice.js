@@ -11,7 +11,7 @@ export const authInitialState = {
   user: null,
   isLoading: false,
   error: null,
-  authChecked: false,
+  isAuthChecked: false,
   isAuthModalOpen: false,
 };
 
@@ -25,8 +25,8 @@ const authSlice = createSlice({
     setUser: (state, action) => {
       state.user = action.payload;
     },
-    setAuthChecked: (state) => {
-      state.authChecked = true;
+    setIsAuthChecked: (state) => {
+      state.isAuthChecked = true;
     },
     clearUser: (state) => {
       state.user = null;
@@ -80,7 +80,7 @@ const authSlice = createSlice({
 
 export const {
   clearAuthError,
-  setAuthChecked,
+  setIsAuthChecked,
   setUser,
   clearUser,
   openAuthModal,

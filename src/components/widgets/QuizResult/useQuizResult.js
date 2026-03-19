@@ -1,7 +1,7 @@
 //useQuizResult.js
 
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams, useSearchParams } from "react-router";
+import { useParams, useSearchParams } from "react-router";
 
 import {
   selectIsQuizFinished,
@@ -12,7 +12,6 @@ import {
 } from "@/redux/features/quizProgress/quizProgressSelector";
 
 import { getQuizTitle } from "../../../constants/quizCategories";
-import { fetchQuizzesAsync } from "@/redux/features/quizContent/quizContentThunks";
 
 import { useNavigationHelper } from "@/hooks/useNavigationHelper";
 import { selectHistoryCanPost } from "@/redux/features/quizHistory/quizHistorySelector";
@@ -29,10 +28,9 @@ import { closeAuthModal } from "@/redux/features/auth/authSlice";
 
 export const useQuizResult = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const { category } = useParams();
-  const { handleGoHome, handleGoHistory, handleSaveHistory } =
+  const { handleGoHome, handleGoHistory, handleSaveHistory, handleRetry } =
     useNavigationHelper();
 
   const numberOfCorrects = useSelector(selectNumberOfCorrects);
@@ -45,6 +43,8 @@ export const useQuizResult = () => {
   const historyCanPost = useSelector(selectHistoryCanPost);
 
   const hasSaved = useRef(false);
+  const isInitialLoggedIn = useRef(!!user);
+
   const [params] = useSearchParams();
   const type = params.get("type");
   const difficulty = params.get("difficulty");
@@ -53,10 +53,6 @@ export const useQuizResult = () => {
   const quizTitle = getQuizTitle(category);
   const getType = TYPE_LABELS[type] || "不明";
   const getDifficulty = DIFFICULTY_LABELS[difficulty] || "不明";
-
-  const handleRetry = async () => {
-    dispatch(fetchQuizzesAsync({ category, type, difficulty, amount }));
-  };
 
   useEffect(() => {
     if (
@@ -68,12 +64,23 @@ export const useQuizResult = () => {
     ) {
       dispatch(addHistoryAsync({ resultData }))
         .unwrap()
-        .then(() => navigate("/quiz/history"));
+        .then(() => {
+          if (!isInitialLoggedIn.current) {
+            handleGoHistory();
+          }
+        });
 
       hasSaved.current = true;
       dispatch(closeAuthModal());
     }
-  }, [dispatch, user, historyCanPost, quizFinished, resultData, navigate]);
+  }, [
+    dispatch,
+    user,
+    historyCanPost,
+    quizFinished,
+    resultData,
+    handleGoHistory,
+  ]);
 
   return {
     quizTitle,

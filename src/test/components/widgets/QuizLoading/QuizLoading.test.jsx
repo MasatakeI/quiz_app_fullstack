@@ -6,19 +6,19 @@ import { describe, test, expect, vi, beforeEach } from "vitest";
 
 import QuizLoading from "@/components/widgets/QuizLoading/QuizLoading";
 
-import quizContentReducer, {
-  contentInitialState,
-} from "@/redux/features/quizContent/quizContentSlice";
 import quizProgressReducer, {
   progressInitialState,
 } from "@/redux/features/quizProgress/quizProgressSlice";
-
+import quizContentReducer, {
+  contentInitialState,
+} from "@/redux/features/quizContent/quizContentSlice";
 import quizSettingsReducer, {
   settingsInitialState,
 } from "@/redux/features/quizSettings/quizSettingsSlice";
 import quizHistoryReducer, {
   quizHistoryInitialState,
 } from "@/redux/features/quizHistory/quizHistorySlice";
+import authReducer, { authInitialState } from "@/redux/features/auth/authSlice";
 
 import { renderWithStore } from "@/test/utils/renderWithStore";
 
@@ -56,12 +56,14 @@ describe("QuizLoading.jsxのテスト", () => {
       quizProgress: quizProgressReducer,
       quizSettings: quizSettingsReducer,
       quizHistory: quizHistoryReducer,
+      auth: authReducer,
     },
     preloadedState: {
       quizContent: { ...contentInitialState, quizzes: [] },
       quizProgress: { ...progressInitialState },
       quizSettings: { ...settingsInitialState },
       quizHistory: { ...quizHistoryInitialState },
+      auth: { ...authInitialState },
     },
   };
 

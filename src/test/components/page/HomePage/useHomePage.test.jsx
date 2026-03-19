@@ -227,7 +227,7 @@ describe("useHomePage.js", () => {
       const before = result.current.items;
 
       act(() => {
-        result.current.items[0].onChange("sports");
+        result.current.items[0].onChange("music");
       });
 
       const after = result.current.items;

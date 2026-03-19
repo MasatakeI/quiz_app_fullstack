@@ -1,34 +1,12 @@
 import React from "react";
 import "./QuizLoading.css";
 
-import { useDispatch, useSelector } from "react-redux";
-import { useParams, useSearchParams } from "react-router";
-
-import {
-  selectIsLoading,
-  selectFetchError,
-} from "@/redux/features/quizContent/quizContentSelector";
-
-import { fetchQuizzesAsync } from "@/redux/features/quizContent/quizContentThunks";
-
-import { useNavigationHelper } from "@/hooks/useNavigationHelper";
-
 import Button from "@/components/common/Button/Button";
 import LoadingSpinner from "@/components/common/LoadingSpinner/LoadingSpinner";
+import { useQuizLoading } from "./useQuizLoading";
 
 const QuizLoading = () => {
-  const dispatch = useDispatch();
-  const { category } = useParams();
-
-  const isLoading = useSelector(selectIsLoading);
-  const fetchError = useSelector(selectFetchError);
-
-  const [params] = useSearchParams();
-  const type = params.get("type");
-  const difficulty = params.get("difficulty");
-  const amount = params.get("amount");
-
-  const { handleGoHome } = useNavigationHelper();
+  const { isLoading, fetchError, handleGoHome, handleRetry } = useQuizLoading();
 
   if (fetchError) {
     return (
@@ -36,15 +14,7 @@ const QuizLoading = () => {
         <p>{fetchError.message}</p>
 
         <div className="quiz-loading-button-container">
-          <Button
-            onClickHandler={() =>
-              dispatch(
-                fetchQuizzesAsync({ category, type, difficulty, amount }),
-              )
-            }
-          >
-            再読み込み
-          </Button>
+          <Button onClickHandler={handleRetry}>再読み込み</Button>
           <Button onClickHandler={handleGoHome}>ホームへ戻る</Button>
         </div>
       </div>

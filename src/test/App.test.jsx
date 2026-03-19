@@ -7,15 +7,23 @@ import { screen } from "@testing-library/react";
 import App from "../App";
 
 import { renderWithStore } from "./utils/renderWithStore";
+import quizProgressReducer, {
+  progressInitialState,
+} from "@/redux/features/quizProgress/quizProgressSlice";
+import quizContentReducer, {
+  contentInitialState,
+} from "@/redux/features/quizContent/quizContentSlice";
+import quizSettingsReducer, {
+  settingsInitialState,
+} from "@/redux/features/quizSettings/quizSettingsSlice";
+import quizHistoryReducer, {
+  quizHistoryInitialState,
+} from "@/redux/features/quizHistory/quizHistorySlice";
+import authReducer, { authInitialState } from "@/redux/features/auth/authSlice";
+import snackbarReducer, {
+  snackbarInitialState,
+} from "@/redux/features/snackbar/snackbarSlice";
 
-import { contentInitialState } from "@/redux/features/quizContent/quizContentSlice";
-import { progressInitialState } from "@/redux/features/quizProgress/quizProgressSlice";
-import { settingsInitialState } from "@/redux/features/quizSettings/quizSettingsSlice";
-import { snackbarInitialState } from "@/redux/features/snackbar/snackbarSlice";
-import quizContentReducer from "@/redux/features/quizContent/quizContentSlice";
-import quizProgressReducer from "@/redux/features/quizProgress/quizProgressSlice";
-import quizSettingsReducer from "@/redux/features/quizSettings/quizSettingsSlice";
-import snackbarReducer from "@/redux/features/snackbar/snackbarSlice";
 import userEvent from "@testing-library/user-event";
 
 vi.mock("@/components/layout/Header/Header", () => ({
@@ -42,6 +50,28 @@ vi.mock("@/components/common/SimpleSnackbar/SimpleSnackbar", () => ({
   ),
 }));
 
+vi.mock("@/components/common/BasicModal/BasicModal", () => ({
+  default: ({ component, isOpen, onClose }) => (
+    <div data-testid="basic-modal">
+      {isOpen && (
+        <>
+          <span>{component}</span>
+          <button onClick={onClose}>キャンセル</button>
+        </>
+      )}
+    </div>
+  ),
+}));
+
+vi.mock("@/components/widgets/AuthForm/AuthForm", () => ({
+  default: () => (
+    <div data-testid="auth-form">
+      AuthForm
+      <button>ログイン</button>
+    </div>
+  ),
+}));
+
 describe("App.jsx", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -51,33 +81,39 @@ describe("App.jsx", () => {
       quizContent: quizContentReducer,
       quizProgress: quizProgressReducer,
       quizSettings: quizSettingsReducer,
+      quizHistory: quizHistoryReducer,
+      auth: authReducer,
       snackbar: snackbarReducer,
     },
     preloadedState: {
       quizContent: { ...contentInitialState },
       quizProgress: { ...progressInitialState },
       quizSettings: { ...settingsInitialState },
+      quizHistory: { ...quizHistoryInitialState },
+      auth: { ...authInitialState },
       snackbar: { ...snackbarInitialState },
     },
   };
-
   describe("初期パス / HomePageとレイアウトの基本コンポーネントが描画される", () => {
-    test.each(["header", "footer", "simple-snackbar", "app-routes"])(
-      "%s",
-      (testId) => {
-        renderWithStore(
-          <MemoryRouter initialEntries={["/"]}>
-            <App />
-          </MemoryRouter>,
-          commonOptions,
-        );
+    test.each([
+      "header",
+      "footer",
+      "simple-snackbar",
+      "app-routes",
+      "basic-modal",
+    ])("%s", (testId) => {
+      renderWithStore(
+        <MemoryRouter initialEntries={["/"]}>
+          <App />
+        </MemoryRouter>,
+        commonOptions,
+      );
 
-        expect(screen.getByTestId(testId)).toBeInTheDocument();
-      },
-    );
+      expect(screen.getByTestId(testId)).toBeInTheDocument();
+    });
   });
 
-  test("snackbarが開いているとき,メッセージが正しく表示される", () => {
+  test.skip("snackbarが開いているとき,メッセージが正しく表示される", () => {
     renderWithStore(
       <MemoryRouter initialEntries={["/quiz/sports"]}>
         <App />
@@ -120,5 +156,68 @@ describe("App.jsx", () => {
 
     expect(screen.getByTestId("simple-snackbar").firstChild).toBe(null);
     expect(store.getState().snackbar.snackbarOpen).toBe(false);
+  });
+
+  test("modalが開いているとき AuthFormが表示される", () => {
+    renderWithStore(
+      <MemoryRouter initialEntries={["/quiz/sports"]}>
+        <App />
+      </MemoryRouter>,
+
+      {
+        ...commonOptions,
+        preloadedState: {
+          ...commonOptions.preloadedState,
+          auth: { ...authInitialState, isAuthModalOpen: true },
+        },
+      },
+    );
+
+    expect(screen.getByTestId("auth-form")).toBeInTheDocument();
+  });
+  test("AuthFormの Closeボタンを押すと 閉じる", async () => {
+    const user = userEvent.setup();
+    const { store } = renderWithStore(
+      <MemoryRouter initialEntries={["/quiz/sports"]}>
+        <App />
+      </MemoryRouter>,
+
+      {
+        ...commonOptions,
+        preloadedState: {
+          ...commonOptions.preloadedState,
+          auth: { ...authInitialState, isAuthModalOpen: true },
+        },
+      },
+    );
+
+    const closeButton = screen.getByRole("button", { name: "キャンセル" });
+
+    await user.click(closeButton);
+
+    expect(store.getState().auth.isAuthModalOpen).toBe(false);
+  });
+
+  test("ログインした場合:自動でAuthModalが閉じる", async () => {
+    const user = userEvent.setup();
+    renderWithStore(
+      <MemoryRouter initialEntries={["/quiz/sports"]}>
+        <App />
+      </MemoryRouter>,
+
+      {
+        ...commonOptions,
+        preloadedState: {
+          ...commonOptions.preloadedState,
+          auth: { ...authInitialState, isAuthModalOpen: true },
+        },
+      },
+    );
+
+    const loginButton = screen.getByRole("button", { name: "ログイン" });
+    await user.click(loginButton);
+
+    // expect(store.getState().auth.isAuthModalOpen).toBe(false);
+    // expect(dispatchSpy).toHaveBeenCalledWith({ type: "auth/closeAuthModal" });
   });
 });

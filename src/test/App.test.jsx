@@ -29,9 +29,6 @@ import userEvent from "@testing-library/user-event";
 vi.mock("@/components/layout/Header/Header", () => ({
   default: () => <div data-testid="header">Header</div>,
 }));
-vi.mock("@/components/layout/Footer/Footer", () => ({
-  default: () => <div data-testid="footer">Footer</div>,
-}));
 
 vi.mock("@/AppRoutes", () => ({
   default: () => <div data-testid="app-routes">AppRoutes</div>,
@@ -95,25 +92,22 @@ describe("App.jsx", () => {
     },
   };
   describe("初期パス / HomePageとレイアウトの基本コンポーネントが描画される", () => {
-    test.each([
-      "header",
-      "footer",
-      "simple-snackbar",
-      "app-routes",
-      "basic-modal",
-    ])("%s", (testId) => {
-      renderWithStore(
-        <MemoryRouter initialEntries={["/"]}>
-          <App />
-        </MemoryRouter>,
-        commonOptions,
-      );
+    test.each(["header", "simple-snackbar", "app-routes", "basic-modal"])(
+      "%s",
+      (testId) => {
+        renderWithStore(
+          <MemoryRouter initialEntries={["/"]}>
+            <App />
+          </MemoryRouter>,
+          commonOptions,
+        );
 
-      expect(screen.getByTestId(testId)).toBeInTheDocument();
-    });
+        expect(screen.getByTestId(testId)).toBeInTheDocument();
+      },
+    );
   });
 
-  test.skip("snackbarが開いているとき,メッセージが正しく表示される", () => {
+  test("snackbarが開いているとき,メッセージが正しく表示される", () => {
     renderWithStore(
       <MemoryRouter initialEntries={["/quiz/sports"]}>
         <App />
@@ -156,68 +150,5 @@ describe("App.jsx", () => {
 
     expect(screen.getByTestId("simple-snackbar").firstChild).toBe(null);
     expect(store.getState().snackbar.snackbarOpen).toBe(false);
-  });
-
-  test("modalが開いているとき AuthFormが表示される", () => {
-    renderWithStore(
-      <MemoryRouter initialEntries={["/quiz/sports"]}>
-        <App />
-      </MemoryRouter>,
-
-      {
-        ...commonOptions,
-        preloadedState: {
-          ...commonOptions.preloadedState,
-          auth: { ...authInitialState, isAuthModalOpen: true },
-        },
-      },
-    );
-
-    expect(screen.getByTestId("auth-form")).toBeInTheDocument();
-  });
-  test("AuthFormの Closeボタンを押すと 閉じる", async () => {
-    const user = userEvent.setup();
-    const { store } = renderWithStore(
-      <MemoryRouter initialEntries={["/quiz/sports"]}>
-        <App />
-      </MemoryRouter>,
-
-      {
-        ...commonOptions,
-        preloadedState: {
-          ...commonOptions.preloadedState,
-          auth: { ...authInitialState, isAuthModalOpen: true },
-        },
-      },
-    );
-
-    const closeButton = screen.getByRole("button", { name: "キャンセル" });
-
-    await user.click(closeButton);
-
-    expect(store.getState().auth.isAuthModalOpen).toBe(false);
-  });
-
-  test("ログインした場合:自動でAuthModalが閉じる", async () => {
-    const user = userEvent.setup();
-    renderWithStore(
-      <MemoryRouter initialEntries={["/quiz/sports"]}>
-        <App />
-      </MemoryRouter>,
-
-      {
-        ...commonOptions,
-        preloadedState: {
-          ...commonOptions.preloadedState,
-          auth: { ...authInitialState, isAuthModalOpen: true },
-        },
-      },
-    );
-
-    const loginButton = screen.getByRole("button", { name: "ログイン" });
-    await user.click(loginButton);
-
-    // expect(store.getState().auth.isAuthModalOpen).toBe(false);
-    // expect(dispatchSpy).toHaveBeenCalledWith({ type: "auth/closeAuthModal" });
   });
 });

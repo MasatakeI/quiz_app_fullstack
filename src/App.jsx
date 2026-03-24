@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import "./App.css";
 
 import Header from "@/components/layout/Header/Header";
@@ -13,49 +13,17 @@ import {
   selectSnackbarMessage,
   selectSnackbarOpen,
 } from "./redux/features/snackbar/snackbarSlice";
-import {
-  selectIsAuthModalOpen,
-  selectUser,
-} from "./redux/features/auth/authSelector";
-import {
-  clearUser,
-  closeAuthModal,
-  setUser,
-} from "./redux/features/auth/authSlice";
-import { onAuthStateChanged } from "firebase/auth";
-
-import { auth } from "./firebase";
+import { selectIsAuthModalOpen } from "./redux/features/auth/authSelector";
+import { closeAuthModal } from "./redux/features/auth/authSlice";
+import { useAuthListener } from "./hooks/useAuthListener";
 
 const App = () => {
   const dispatch = useDispatch();
+  useAuthListener();
+
   const snackbarOpen = useSelector(selectSnackbarOpen);
   const snackbarMessage = useSelector(selectSnackbarMessage);
-
   const isAuthModalOpen = useSelector(selectIsAuthModalOpen);
-  const user = useSelector(selectUser);
-
-  useEffect(() => {
-    if (user) {
-      dispatch(closeAuthModal());
-    }
-  }, [dispatch, user]);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        dispatch(
-          setUser({
-            uid: user.uid,
-            email: user.email,
-          }),
-        );
-      } else {
-        dispatch(clearUser());
-      }
-    });
-
-    return () => unsubscribe();
-  }, [dispatch]);
 
   return (
     <div className="app">

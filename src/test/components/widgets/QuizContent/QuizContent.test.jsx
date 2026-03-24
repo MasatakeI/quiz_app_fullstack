@@ -78,6 +78,19 @@ describe("QuizContent.jsxのテスト", () => {
     },
   };
 
+  test("初期状態では アラートが表示されず ボタンが有効である", () => {
+    renderWithStore(<QuizContent />, commonOption);
+
+    expect(
+      screen.queryByRole("button", { name: "次へ" }),
+    ).not.toBeInTheDocument();
+
+    const answerButtons = screen.getAllByRole("button", { name: /^[A-D]\./ });
+    answerButtons.forEach((btn) => {
+      expect(btn).not.toBeDisabled();
+    });
+  });
+
   test("shuffledAnswersがQuizAnswersに渡される", () => {
     renderWithStore(<QuizContent />, commonOption);
 

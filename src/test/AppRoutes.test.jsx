@@ -24,6 +24,7 @@ import snackbarReducer, {
 import quizHistoryReducer, {
   quizHistoryInitialState,
 } from "@/redux/features/quizHistory/quizHistorySlice";
+import authReducer, { authInitialState } from "@/redux/features/auth/authSlice";
 
 vi.mock("@/components/page/HomePage/HomePage", () => ({
   default: () => <div data-testid="home-page">HomePage</div>,
@@ -46,6 +47,7 @@ describe("AppRoutes.jsx", () => {
       quizSettings: quizSettingsReducer,
       snackbar: snackbarReducer,
       quizHistory: quizHistoryReducer,
+      auth: authReducer,
     },
     preloadedState: {
       quizContent: { ...contentInitialState },
@@ -53,6 +55,7 @@ describe("AppRoutes.jsx", () => {
       quizSettings: { ...settingsInitialState },
       snackbar: { ...snackbarInitialState },
       quizHistory: { ...quizHistoryInitialState },
+      auth: { ...authInitialState },
     },
   };
 
@@ -79,15 +82,33 @@ describe("AppRoutes.jsx", () => {
     expect(screen.getByTestId("quiz-page")).toBeInTheDocument();
   });
 
-  test("/quiz/history にアクセスすると HistoryPage が表示される", () => {
+  test("ログインした状態で /quiz/history にアクセスすると HistoryPage が表示される", () => {
     renderWithStore(
       <MemoryRouter initialEntries={["/quiz/history"]}>
         <AppRoutes />
       </MemoryRouter>,
-      commonOptions,
+      {
+        ...commonOptions,
+        preloadedState: {
+          ...commonOptions.preloadedState,
+          auth: { ...authInitialState, user: { uid: "aaa" } },
+        },
+      },
     );
 
     expect(screen.getByTestId("history-page")).toBeInTheDocument();
+    expect(screen.queryByTestId("quiz-page")).not.toBeInTheDocument();
+  });
+  test("未ログイン状態で /quiz/history にアクセスすると HomePageに リダイレクトされる", () => {
+    renderWithStore(
+      <MemoryRouter initialEntries={["/quiz/history"]}>
+        <AppRoutes />
+      </MemoryRouter>,
+
+      commonOptions,
+    );
+
+    expect(screen.getByTestId("home-page")).toBeInTheDocument();
     expect(screen.queryByTestId("quiz-page")).not.toBeInTheDocument();
   });
 

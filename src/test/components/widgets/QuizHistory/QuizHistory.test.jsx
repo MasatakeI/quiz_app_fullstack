@@ -31,6 +31,11 @@ vi.mock("react-router", () => {
   return {
     ...actual,
     useNavigate: () => mockNavigate,
+    useParams: () => ({ category: "sports" }),
+    useSearchParams: () => [
+      new URLSearchParams("type=boolean&difficulty=easy&amount=5"),
+      vi.fn(),
+    ],
   };
 });
 

@@ -2,6 +2,7 @@ import React from "react";
 
 import "./QuizHistoryItem.css";
 import IconButton from "@/components/common/IconButton/IconButton";
+
 import Checkbox from "@mui/material/Checkbox";
 import { faRotateLeft, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { DIFFICULTY_LABELS, TYPE_LABELS } from "@/constants/quizTranslations";
@@ -52,7 +53,7 @@ const QuizHistoryItem = ({
       <div className="history-conditions">
         <span className="history-category">
           {QUIZ_TITLE_MAP[historyCategory]}
-        </span>{" "}
+        </span>
         <span className="history-difficulty">{TYPE_LABELS[historyType]}</span>
         <span className="history-difficulty">
           {DIFFICULTY_LABELS[historyDifficulty]}

@@ -4,11 +4,13 @@ import {
   addHistoryAsync,
   fetchHistoriesAsync,
   deleteHistoryAsync,
+  deleteHistoriesAsync,
 } from "@/redux/features/quizHistory/quizHistoryThunks";
 import {
   addHistory,
   deleteHistory,
   fetchHistories,
+  deleteHistories,
 } from "@/models/QuizHistoryModel";
 
 import {
@@ -23,6 +25,7 @@ vi.mock("@/models/QuizHistoryModel", () => ({
   addHistory: vi.fn(),
   fetchHistories: vi.fn(),
   deleteHistory: vi.fn(),
+  deleteHistories: vi.fn(),
 }));
 
 //ヘルパー
@@ -66,14 +69,25 @@ const SUCCESS_CASES = [
     title: "deleteHistoryAsync",
     condition: { isDeleting: false },
     authState: { user: { uid: "@@@" } },
-
     mockFn: deleteHistory,
     arg: mockQuizHistories[0].id,
     thunk: deleteHistoryAsync,
     params: { id: mockQuizHistories[0].id },
-    expected: mockQuizHistories[0],
-    type: "quizHistory/deleteHistory/fulfilled",
-    snackbarMessage: "クイズ結果の削除に成功しました",
+    expected: mockQuizHistories[0].id,
+    type: "quizHistory/delete/fulfilled",
+    snackbarMessage: "選択したクイズ結果を削除しました",
+  },
+  {
+    title: "deleteHistoriesAsync",
+    condition: { isDeleting: false },
+    authState: { user: { uid: "@@@" } },
+    mockFn: deleteHistories,
+    arg: [[mockQuizHistories[0].id, mockQuizHistories[1].id]],
+    thunk: deleteHistoriesAsync,
+    params: { ids: [mockQuizHistories[0].id, mockQuizHistories[1].id] },
+    expected: [mockQuizHistories[0].id, mockQuizHistories[1].id],
+    type: "quizHistory/bulkDelete/fulfilled",
+    snackbarMessage: `${[mockQuizHistories[0].id, mockQuizHistories[1].id].length}件のクイズ結果を削除しました`,
   },
 ];
 
@@ -103,7 +117,15 @@ const FAILED_MODEL_FUNCTION_CASE = [
     mockFn: deleteHistory,
     thunk: deleteHistoryAsync,
     params: { id: mockQuizHistories[0].id },
-    type: "quizHistory/deleteHistory/rejected",
+    type: "quizHistory/delete/rejected",
+  },
+  {
+    title: "deleteHistoriesAsync",
+    condition: { isDeleting: false },
+    mockFn: deleteHistories,
+    thunk: deleteHistoriesAsync,
+    params: { ids: [mockQuizHistories[0].id, mockQuizHistories[1].id] },
+    type: "quizHistory/bulkDelete/rejected",
   },
 ];
 const FAILED_OPTIONS_CASE = [
@@ -144,6 +166,13 @@ const FAILED_OPTIONS_CASE = [
     mockFn: deleteHistory,
     thunk: deleteHistoryAsync,
     params: { id: mockQuizHistories[0].id },
+    condition: { isDeleting: true },
+  },
+  {
+    title: "deleteHistoriesAsync",
+    mockFn: deleteHistories,
+    thunk: deleteHistoriesAsync,
+    params: { ids: [mockQuizHistories[0].id, mockQuizHistories[1].id] },
     condition: { isDeleting: true },
   },
 ];

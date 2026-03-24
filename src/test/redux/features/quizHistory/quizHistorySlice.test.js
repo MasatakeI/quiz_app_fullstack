@@ -4,6 +4,7 @@ import {
   addHistoryAsync,
   fetchHistoriesAsync,
   deleteHistoryAsync,
+  deleteHistoriesAsync,
 } from "@/redux/features/quizHistory/quizHistoryThunks";
 
 import quizHistoryReducer, {
@@ -87,15 +88,26 @@ describe("quizHistorySlice", () => {
     });
   });
 
-  describe("deleteHistoryAsync", () => {
-    test("正常系:pendingからfulfilledに遷移し 指定したidのhistoryを削除する", async () => {
+  describe("delete系 正常系共通処理", () => {
+    test.each([
+      {
+        title: "deleteHistoryAsync",
+        thunk: deleteHistoryAsync,
+        payload: mockQuizHistories[0].id,
+      },
+      {
+        title: "deleteHistoriesAsync",
+        thunk: deleteHistoriesAsync,
+        payload: [mockQuizHistories[0].id, mockQuizHistories[1].id],
+      },
+    ])("$title", async ({ thunk, payload }) => {
       const stateWithHistories = {
         ...quizHistoryInitialState,
         histories: mockQuizHistories,
       };
       const pending = applyPending(
         quizHistoryReducer,
-        deleteHistoryAsync,
+        thunk,
         stateWithHistories,
       );
       expect(pending).toEqual({
@@ -106,12 +118,13 @@ describe("quizHistorySlice", () => {
       const fulfilled = applyFulfilled(
         quizHistoryReducer,
         deleteHistoryAsync,
-        mockQuizHistories[0],
+        payload,
         pending,
       );
 
-      const expectedHisotries = mockQuizHistories.filter((quiz) => {
-        return quiz.id !== mockQuizHistories[0].id;
+      const deleteIds = Array.isArray(payload) ? payload : [payload];
+      const expectedHisotries = mockQuizHistories.filter((his) => {
+        return !deleteIds.includes(his.id);
       });
 
       expect(fulfilled).toEqual({
@@ -128,6 +141,7 @@ describe("quizHistorySlice", () => {
       { title: "addHistoryAsync", thunk: addHistoryAsync },
       { title: "fetchHistoriesAsync", thunk: fetchHistoriesAsync },
       { title: "deleteHistoryAsync", thunk: deleteHistoryAsync },
+      { title: "deleteHistoriesAsync", thunk: deleteHistoriesAsync },
     ])("$title", ({ thunk }) => {
       const prev = {
         ...quizHistoryInitialState,

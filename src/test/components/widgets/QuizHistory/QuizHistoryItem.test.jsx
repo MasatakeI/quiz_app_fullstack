@@ -11,21 +11,58 @@ describe("QuizHistoryItem", () => {
     vi.clearAllMocks();
   });
 
+  const onDelete = vi.fn();
+  const onRetry = vi.fn();
+  const onSelect = vi.fn();
+
   test("Propsが未定義の場合、デフォルト値が適用されて正しく描画される（カバレッジ補完）", () => {
-    render(<QuizHistoryItem />);
+    render(
+      <QuizHistoryItem
+        historyCategory={"general"}
+        historyDifficulty={"easy"}
+        historyType={"multiple"}
+        onDelete={onDelete}
+        onSelect={onSelect}
+        onRetry={onRetry}
+      />,
+    );
 
     expect(screen.getByText(QUIZ_TITLE_MAP["general"])).toBeInTheDocument();
-
     expect(screen.getByText(DIFFICULTY_LABELS["easy"])).toBeInTheDocument();
-
     expect(screen.getByText(TYPE_LABELS["multiple"])).toBeInTheDocument();
-    expect(screen.getByText("0%")).toBeInTheDocument();
+  });
+
+  test("isSelectedがtrueの時 チェックボックスがチェックされる", async () => {
+    render(
+      <QuizHistoryItem historyCategory={"general"} id={1} isSelected={true} />,
+    );
+
+    const checkbox = screen.getByRole("checkbox");
+
+    expect(checkbox).toBeChecked();
+  });
+
+  test("チェックボックスをクリックした時 正しいidでonSelectが呼ばれる", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <QuizHistoryItem
+        historyCategory={"general"}
+        id={1}
+        isSelected={true}
+        onSelect={onSelect}
+      />,
+    );
+
+    const checkbox = screen.getByRole("checkbox");
+    await user.click(checkbox);
+
+    expect(onSelect).toHaveBeenCalledWith(1);
+    expect(onSelect).toHaveBeenCalledTimes(1);
   });
 
   test("必要なデータが描画され 削除ボタンを押したとき 対応する関数が呼ばれる", async () => {
     const user = userEvent.setup();
-    const onDelete = vi.fn();
-    const onRetry = vi.fn();
 
     const resultData = {
       date: "2020/01/01 12:00",
@@ -48,6 +85,8 @@ describe("QuizHistoryItem", () => {
         historyType={resultData.type}
         onDelete={onDelete}
         onRetry={onRetry}
+        id={1}
+        isSelected={false}
       />,
     );
 

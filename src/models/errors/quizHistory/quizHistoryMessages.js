@@ -2,8 +2,6 @@
 
 import { QUIZ_HISTORY_ERROR_CODE } from "./quizHistoryErrorCode";
 
-export const QUIZ_HISTORY_MESSAGE = {};
-
 export const QUIZ_HISTORY_ERROR_MAP = {
   "permission-denied": {
     code: QUIZ_HISTORY_ERROR_CODE.PERMISSION,

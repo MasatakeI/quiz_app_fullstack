@@ -1,0 +1,43 @@
+name: Test and Coverage
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests with coverage
+        run: npm test -- --coverage
+        env:
+          # Firebase等の環境変数が必要な場合はここに定義（ダミー値でOKな場合が多い）
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: "test-domain.firebaseapp.com"
+          VITE_FIREBASE_PROJECT_ID: "test-project"
+          VITE_FIREBASE_STORAGE_BUCKET: "test-bucket"
+          VITE_FIREBASE_MESSAGING_SENDER_ID: "123456789"
+          VITE_FIREBASE_APP_ID: "1:123456789:web:abcdef"
+
+      # カバレッジ結果をGitHubのサマリーに表示（任意）
+      - name: Upload coverage results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/

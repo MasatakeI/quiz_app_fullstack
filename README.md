@@ -1,78 +1,26 @@
-# プロジェクト詳細：高信頼性クイズアプリケーション
+# クイズアプリ（React / Redux Toolkit / Firebase）
+
+![Test and Coverage](https://github.com/MasatakeI/quiz_app/actions/workflows/test.yml/badge.svg)
 
 ## 概要
 
-Open Trivia Database API を活用した、カスタマイズ性の高い学習用 Web
-アプリケーション。
+Open Trivia Database API を活用した、カスタマイズ性の高い学習用 Web アプリケーション。
+個人開発ながら、**「実務レベルのテスタビリティ」と「疎結合なアーキテクチャ」**の完遂をテーマとし、フロントエンドから BaaS 連携まで一貫した設計・実装を行いました。
 
-個人開発ながら、\
-**「実務レベルのテスタビリティ」と「疎結合なアーキテクチャ」**の完遂をテーマとし、\
-フロントエンドから BaaS 連携まで一貫した設計・実装を行いました。
-
----
-
-## ライブデモ
-
-https://quiz-app-zeta-pearl.vercel.app/
-
----
-
-## 開発環境
-
-- React 18\
-- Redux Toolkit\
-- React Router 6\
-- Firebase (Auth / Firestore)\
-- Vitest\
-- React Testing Library
-
----
-
-## アーキテクチャと設計思想
-
-大規模開発への拡張を想定し、\
-**関心の分離（Separation of Concerns）**を徹底した 4 層構造を採用。
-
-### レイヤー構成
-
-- **UI 層**: React / CSS Modules\
-  → 描画・イベント検知に限定
-
-- **Hooks 層**: Custom Hooks\
-  → UI ロジック・副作用の集約
-
-- **State 層**: Redux Toolkit\
-  → 状態遷移・非同期 Thunk の制御
-
-- **Domain / Infra 層**: Models / Fetchers\
-  → 正規化・デコード・エラーマッピング
-
----
-
-## 技術的な選定理由とこだわり
-
-### 宣言的ルーティングと認可制御
-
-- `AppRoutes` に認可ロジック（Auth Guard）を独立\
-- コンポーネントが認証状態を意識しない設計
-
----
-
-### 抽象化されたエラーハンドリング
-
-- `mapError` 変換層を設置\
-- Firebase 等の外部依存エラーを独自クラス `QuizHistoryError` へ変換\
-- UI 層に影響を与えない「変更に強い」設計
+- **ライブデモ**: [https://quiz-app-zeta-pearl.vercel.app/](https://quiz-app-zeta-pearl.vercel.app/)
+- **開発環境**: React 18, Redux Toolkit, React Router 6, Firebase (Auth/Firestore), Vitest, React Testing Library
 
 ---
 
 ## アーキテクチャと設計思想
 
 大規模開発への拡張を想定し、**関心の分離（Separation of Concerns）**を徹底した 4 層構造を採用しています。
+
+```mermaid
 graph TD
-subgraph UI_Layer [UI Layer]
-Components[React Components / CSS Modules]
-end
+    subgraph UI_Layer [UI Layer]
+        Components[React Components / CSS Modules]
+    end
 
     subgraph Logic_Layer [Logic Layer]
         Hooks[Custom Hooks / Nav Helpers]
@@ -92,12 +40,26 @@ end
     Redux --> Fetcher
     Fetcher --> Models
     Models --> Redux
+```
 
-### 技術的な選定理由とこだわり
+---
 
--**宣言的ルーティングと認可制御**: AppRoutes に認可ロジック（Auth Guard）を独立させ、コンポーネントが認証状態を意識せずに済む設計を徹底。
+## 技術的な選定理由とこだわり
 
--**抽象化されたエラーハンドリング**: mapError 変換層を設け、Firebase 等の外部依存エラーを独自クラス QuizHistoryError へ変換。バックエンドの仕様変更が UI 層に波及しない「変更に強い」設計を実現。
+### 宣言的ルーティングと認可制御
+
+- `AppRoutes` に認可ロジック（Auth Guard）を独立\
+- コンポーネントが認証状態を意識しない設計
+
+---
+
+### 抽象化されたエラーハンドリング
+
+- `mapError` 変換層を設置\
+- Firebase 等の外部依存エラーを独自クラス `QuizHistoryError` へ変換\
+- UI 層に影響を与えない「変更に強い」設計
+
+---
 
 ## 技術的な挑戦と課題解決（Selected Achievements）
 
@@ -156,14 +118,14 @@ Redux Toolkit の `condition` オプションを活用し、\
 
 カテゴリ 対象範囲・内容 指標
 
-ユニットテスト Model（デコード / 正規化）, 100% Pass
-Redux（Selector / Reducer）
-
-統合テスト Hooks（Dispatch連携）, UI（表示状態 85%〜 Branch
-/ 遷移ガード）
-
-コード品質 ESLint / Prettier による静的解析, 常用
-he による XSS 対策
+- **ユニットテスト** Model（デコード / 正規化）, 100% Pass
+  Redux（Selector / Reducer）
+- **統合テスト** Hooks（Dispatch連携）, UI（表示状態 85%〜 Branch
+  / 遷移ガード）
+- **コード品質** ESLint / Prettier による静的解析, 常用
+  he による XSS 対策
+- **継続的インテグレーション (CI)**: GitHub Actions を利用し、Push/PR ごとに自動テストとカバレッジ計測を実行。
+- **カバレッジ目標**: 主要ロジック層において Branch Coverage 80% 以上を維持。
 
 ---
 
@@ -213,12 +175,16 @@ he による XSS 対策
 
 ### CI/CD
 
-- GitHub Actions によるテスト・カバレッジ自動レポート化
+- [x] CI/CDの導入（GitHub Actionsによる自動テスト）
 
 ### Performance
 
-- `React.lazy` / `Suspense` による Code Splitting
+- []`React.lazy` / `Suspense` による Code Splitting
 
 ### PWA
 
-- Service Worker によるオフラインプレイ対応
+- []Service Worker によるオフラインプレイ対応
+
+```
+
+```

@@ -25,6 +25,17 @@ const QuizHistoryItem = ({
 }) => {
   const label = { slotProps: { input: { "aria-label": "Checkbox demo" } } };
 
+  const accuracy =
+    historyTotalQuestions > 0
+      ? Math.round((historyScore / historyTotalQuestions) * 100)
+      : 0;
+
+  const getStatusClass = () => {
+    if (historyAccuracy >= 0.8) return "score-excellent";
+    if (historyAccuracy >= 0.5) return "score-good";
+    return "score-poor";
+  };
+
   return (
     <div className="history-card">
       <div className="history-header">
@@ -68,8 +79,8 @@ const QuizHistoryItem = ({
         </div>
         <div className="history-stat-item">
           <span className="history-label">Accuracy</span>
-          <span className="history-value history-accuracy-highlight">
-            {Math.round(historyAccuracy * 100)}%
+          <span className={`history-value ${getStatusClass()}`}>
+            {accuracy}%
           </span>
         </div>
       </div>

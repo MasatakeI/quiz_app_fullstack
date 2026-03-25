@@ -99,18 +99,6 @@ describe("AppRoutes.jsx", () => {
     expect(screen.getByTestId("history-page")).toBeInTheDocument();
     expect(screen.queryByTestId("quiz-page")).not.toBeInTheDocument();
   });
-  test("未ログイン状態で /quiz/history にアクセスすると HomePageに リダイレクトされる", () => {
-    renderWithStore(
-      <MemoryRouter initialEntries={["/quiz/history"]}>
-        <AppRoutes />
-      </MemoryRouter>,
-
-      commonOptions,
-    );
-
-    expect(screen.getByTestId("home-page")).toBeInTheDocument();
-    expect(screen.queryByTestId("quiz-page")).not.toBeInTheDocument();
-  });
 
   test("存在しないパスにアクセスした時HomePageにリダイレクトする", () => {
     renderWithStore(

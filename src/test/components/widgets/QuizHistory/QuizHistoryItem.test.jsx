@@ -112,22 +112,20 @@ describe("QuizHistoryItem", () => {
   });
 
   test.each([
-    { accuracy: 0.33333, expected: "33%" },
-    { accuracy: 0.5555, expected: "56%" },
-    { accuracy: 0, expected: "0%" },
-    { accuracy: 1, expected: "100%" },
-  ])(
-    "正解率 $accuracy が $expected に変換されること",
-    ({ accuracy, expected }) => {
-      render(
-        <QuizHistoryItem
-          historyAccuracy={accuracy}
-          historyCategory="sports" // ダミーの有効なキーを渡す
-          historyType="multiple"
-          historyDifficulty="easy"
-        />,
-      );
-      expect(screen.getByText(expected)).toBeInTheDocument();
-    },
-  );
+    { score: 1, total: 3, expected: "33%" },
+    { score: 5, total: 9, expected: "56%" },
+    { score: 0, total: 10, expected: "0%" },
+    { score: 10, total: 10, expected: "100%" },
+  ])("正解率  が $expected に変換されること", ({ score, total, expected }) => {
+    render(
+      <QuizHistoryItem
+        historyScore={score}
+        historyTotalQuestions={total}
+        historyCategory="sports" // ダミーの有効なキーを渡す
+        historyType="multiple"
+        historyDifficulty="easy"
+      />,
+    );
+    expect(screen.getByText(expected)).toBeInTheDocument();
+  });
 });

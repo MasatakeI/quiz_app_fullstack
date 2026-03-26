@@ -23,7 +23,7 @@ import {
   writeBatch,
 } from "firebase/firestore";
 
-import { QuizHistoryError } from "@/models/errors/quizHistory/quizHistoryError";
+import { QuizHistoryError } from "@/models/errors/quizHistory/QuizHistoryError";
 import { QUIZ_HISTORY_ERROR_CODE } from "@/models/errors/quizHistory/quizHistoryErrorCode";
 
 vi.mock("firebase/firestore", () => ({

@@ -13,7 +13,7 @@ import {
 } from "firebase/firestore";
 
 import { quizHistoryRef, db } from "@/firebase";
-import { QuizHistoryError } from "./errors/quizHistory/quizHistoryError";
+import { QuizHistoryError } from "./errors/quizHistory/QuizHistoryError";
 import { QUIZ_HISTORY_ERROR_CODE } from "./errors/quizHistory/quizHistoryErrorCode";
 import { mapQuizHistoryError } from "./errors/quizHistory/mapQuizHistoryError";
 

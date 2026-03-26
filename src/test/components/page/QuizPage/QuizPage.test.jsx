@@ -3,27 +3,25 @@
 import { screen } from "@testing-library/react";
 import { describe, test, expect, vi, beforeEach } from "vitest";
 
-import { contentInitialState } from "@/redux/features/quizContent/quizContentSlice";
-import { progressInitialState } from "@/redux/features/quizProgress/quizProgressSlice";
-import quizContentReducer from "@/redux/features/quizContent/quizContentSlice";
-import quizProgressReducer from "@/redux/features/quizProgress/quizProgressSlice";
+import QuizPage from "@/components/page/QuizPage/QuizPage";
 
-import QuizPage from "../../../../components/page/QuizPage/QuizPage";
+import quizContentReducer, {
+  contentInitialState,
+} from "@/redux/features/quizContent/quizContentSlice";
+import quizProgressReducer, {
+  progressInitialState,
+} from "@/redux/features/quizProgress/quizProgressSlice";
+import quizHistoryReducer, {
+  quizHistoryInitialState,
+} from "@/redux/features/quizHistory/quizHistorySlice";
+import authReducer, { authInitialState } from "@/redux/features/auth/authSlice";
+import quizSettingsReducer, {
+  settingsInitialState,
+} from "@/redux/features/quizSettings/quizSettingsSlice";
+
 import { renderWithStore } from "@/test/utils/renderWithStore";
 
-import * as quizContentThunk from "@/redux/features/quizContent/quizContentThunks";
-
-vi.mock("@/components/widgets/QuizLoading/QuizLoading", () => ({
-  default: () => <div>Loading</div>,
-}));
-
-vi.mock("../../../../components/widgets/QuizContent/QuizContent", () => ({
-  default: () => <div>Content</div>,
-}));
-
-vi.mock("@/components/widgets/QuizResult/QuizResult", () => ({
-  default: () => <div>Result</div>,
-}));
+import * as quizContentThunks from "@/redux/features/quizContent/quizContentThunks";
 
 const mockNavigate = vi.fn();
 
@@ -44,15 +42,15 @@ vi.mock("react-router", () => {
 describe("QuizPage.jsx", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.spyOn(quizContentThunk, "fetchQuizzesAsync").mockReturnValue({
-      type: "mock",
-    });
   });
 
   const commonOption = {
     reducers: {
       quizContent: quizContentReducer,
       quizProgress: quizProgressReducer,
+      quizHistory: quizHistoryReducer,
+      auth: authReducer,
+      quizSettings: quizSettingsReducer,
     },
     preloadedState: {
       quizContent: {
@@ -61,12 +59,15 @@ describe("QuizPage.jsx", () => {
         isLoading: false,
         fetchError: null,
       },
-      quizProgress: { ...progressInitialState },
+      quizProgress: { ...progressInitialState, currentIndex: 0 },
+      quizHistory: { ...quizHistoryInitialState },
+      auth: { ...authInitialState },
+      quizSettings: { ...settingsInitialState },
     },
   };
 
   test("マウント時 fetchQuizzesAsync が 正しい引数で呼ばれる", async () => {
-    const fetchSpy = vi.spyOn(quizContentThunk, "fetchQuizzesAsync");
+    const fetchSpy = vi.spyOn(quizContentThunks, "fetchQuizzesAsync");
     renderWithStore(<QuizPage />, commonOption);
 
     expect(fetchSpy).toHaveBeenCalledWith({
@@ -107,7 +108,12 @@ describe("QuizPage.jsx", () => {
       ...commonOption,
       preloadedState: {
         ...commonOption.preloadedState,
-        quizProgress: { currentIndex: 5 },
+        quizProgress: {
+          currentIndex: 5,
+          userAnswers: [
+            { numberOfCorrects: 3, allAnswers: ["1", "2", "3", "4"] },
+          ],
+        },
       },
     });
 
@@ -151,10 +157,13 @@ describe("QuizPage.jsx", () => {
       },
     });
 
-    expect(screen.getByText("Loading")).toBeInTheDocument();
+    expect(screen.getByText("エラー")).toBeInTheDocument();
   });
 
   test("quizFinished=trueの時QuizResultが表示される", () => {
+    vi.spyOn(quizContentThunks, "fetchQuizzesAsync").mockReturnValue({
+      type: "none",
+    });
     renderWithStore(<QuizPage />, {
       ...commonOption,
       preloadedState: {
@@ -171,10 +180,13 @@ describe("QuizPage.jsx", () => {
       },
     });
 
-    expect(screen.getByText("Result")).toBeInTheDocument();
+    expect(screen.getByText(/スポーツクイズ 結果/)).toBeInTheDocument();
   });
 
   test("通常時はQuizContentが表示される", () => {
+    vi.spyOn(quizContentThunks, "fetchQuizzesAsync").mockReturnValue({
+      type: "none",
+    });
     renderWithStore(<QuizPage />, {
       ...commonOption,
       preloadedState: {
@@ -184,12 +196,10 @@ describe("QuizPage.jsx", () => {
           isLoading: false,
           fetchError: null,
         },
-        quizProgress: {
-          ...commonOption.preloadedState.quizProgress,
-          currentIndex: 2,
-        },
+        quizSettings: { ...settingsInitialState },
       },
     });
-    expect(screen.getByText("Content")).toBeInTheDocument();
+
+    expect(screen.getByText(/スポーツクイズ/)).toBeInTheDocument();
   });
 });

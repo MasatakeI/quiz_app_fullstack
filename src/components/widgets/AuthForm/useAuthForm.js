@@ -9,11 +9,8 @@ import {
   signInUserAsync,
 } from "@/redux/features/auth/authThunks";
 
-import { useNavigate } from "react-router";
-
 export const useAuthForm = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const isLoading = useSelector(selectIsAuthLoading);
 
@@ -35,8 +32,8 @@ export const useAuthForm = () => {
 
       setSignUpEmail("");
       setSignUpPassword("");
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -51,16 +48,10 @@ export const useAuthForm = () => {
         }),
       ).unwrap();
 
-      const currentPath = window.location.pathname;
-
-      if (!currentPath.includes("/")) {
-        navigate("/quiz/history");
-      }
-
       setSignInEmail("");
       setSignInPassword("");
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -69,21 +60,19 @@ export const useAuthForm = () => {
     setEmail: setSignUpEmail,
     password: signUpPassword,
     setPassword: setSignUpPassword,
-    // onSubmit: handleSignUp,
+    onSubmit: handleSignUp,
   };
   const signInState = {
     email: signInEmail,
     setEmail: setSignInEmail,
     password: signInPassword,
     setPassword: setSignInPassword,
-    // onSubmit: handleSignIn,
+    onSubmit: handleSignIn,
   };
 
   return {
     isLoading,
     signUpState,
     signInState,
-    handleSignUp,
-    handleSignIn,
   };
 };

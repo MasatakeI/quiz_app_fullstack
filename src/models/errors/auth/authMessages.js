@@ -4,7 +4,7 @@ import { AUTH_ERROR_CODE } from "./authErrorCode";
 
 export const AUTH_MESSAGE = {
   REQUIRED: "メールアドレスとパスワードは必須です",
-  PASSWORD_LENGTH: "パスワードは6文字異常です",
+  PASSWORD_LENGTH: "パスワードは6文字以上です",
   NOT_AUTHENTICATION: "認証されていないメールアドレスのためログインできません",
 };
 

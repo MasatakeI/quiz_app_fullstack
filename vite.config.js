@@ -1,11 +1,8 @@
 /// <reference types="vitest" />
-
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-
 import path from "path";
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react({
@@ -15,12 +12,30 @@ export default defineConfig({
     }),
   ],
 
+  // すべてのテスト設定（カバレッジ含む）はこの中に記述します
   test: {
-    globals: true, // expect などを global で使えるようにする
-    environment: "jsdom", // ブラウザ環境をシミュレート
-    setupFiles: ["./src/setupTests.js"], // 初期設定ファイルを指定
+    globals: true,
+    environment: "jsdom",
+    setupFiles: ["./src/setupTests.js"],
     coverage: {
-      exclude: ["**/*.css", "**/node_modules/**"], // CSSを除外
+      provider: "v8",
+      reporter: ["text", "html", "json-summary", "json"],
+      reportsDirectory: "./coverage",
+      // 統計から除外するファイルをここに集約します
+      exclude: [
+        "node_modules/**",
+        "dist/**",
+        "coverage/**",
+        "src/test/**", // テスト用ユーティリティ
+        "**/*.test.*", // テストファイル本体
+        "**/*.spec.*",
+        "src/main.jsx", // エントリーポイント（レンダリングのみなので除外が一般的）
+        "**/*.css", // スタイルファイル
+        "vite.config.js", // 設定ファイル
+        "eslint.config.js",
+        ".github/**",
+        "coverage2",
+      ],
     },
   },
 
@@ -28,18 +43,5 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
-  },
-  coverage: {
-    provider: "v8",
-    reporter: ["text", "html", "json"],
-    reportsDirectory: "./coverage",
-    exclude: [
-      "node_modules/",
-      "src/test/",
-      "**/*.test.*",
-      "**/*.spec.*",
-      "src/main.jsx",
-      "**/*.css",
-    ],
   },
 });

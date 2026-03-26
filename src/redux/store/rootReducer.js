@@ -1,3 +1,4 @@
+// src/redux/store/rootReducer.js
 import { combineReducers } from "redux";
 
 import quizContentReducer from "../features/quizContent/quizContentSlice";

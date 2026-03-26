@@ -17,6 +17,10 @@ export const renderHookWithStore = ({
   const store = configureStore({
     reducer: reducers,
     preloadedState,
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        serializableCheck: false,
+      }),
   });
 
   const dispatchSpy = vi.spyOn(store, "dispatch");

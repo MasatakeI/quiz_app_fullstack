@@ -1,7 +1,7 @@
 // src/test/models/errors/quizHistory/QuizHistoryError.js
 import { describe, test, expect } from "vitest";
 
-import { QuizHistoryError } from "@/models/errors/quizHistory/quizHistoryError";
+import { QuizHistoryError } from "@/models/errors/quizHistory/QuizHistoryError";
 import { QUIZ_HISTORY_ERROR_CODE } from "@/models/errors/quizHistory/quizHistoryErrorCode";
 import { ModelError } from "@/models/errors/ModelError";
 

@@ -1,6 +1,6 @@
 //src/models/errors/quizHistory/mapQuizHistoryError.js
 
-import { QuizHistoryError } from "./quizHistoryError";
+import { QuizHistoryError } from "./QuizHistoryError";
 import { QUIZ_HISTORY_ERROR_CODE } from "./quizHistoryErrorCode";
 import { QUIZ_HISTORY_ERROR_MAP } from "./quizHistoryMessages";
 

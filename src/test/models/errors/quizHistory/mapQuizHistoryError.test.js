@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach, vi } from "vitest";
 
-import { QuizHistoryError } from "@/models/errors/quizHistory/quizHistoryError";
+import { QuizHistoryError } from "@/models/errors/quizHistory/QuizHistoryError";
 import { QUIZ_HISTORY_ERROR_CODE } from "@/models/errors/quizHistory/quizHistoryErrorCode";
 import { mapQuizHistoryError } from "@/models/errors/quizHistory/mapQuizHistoryError";
 import { QUIZ_HISTORY_ERROR_MAP } from "@/models/errors/quizHistory/quizHistoryMessages";
@@ -24,7 +24,6 @@ describe("mapQuizHistoryError.test", () => {
     {
       errorCode: "permission-denied",
       key: "permission-denied",
-
     },
     {
       errorCode: "not-found",

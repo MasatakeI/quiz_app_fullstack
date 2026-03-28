@@ -104,14 +104,19 @@ describe("QuizLoading.jsxのテスト", () => {
       ...commonOption,
       preloadedState: {
         ...commonOption.preloadedState,
-        quizContent: { isLoading: false, fetchError: { message: "エラー" } },
+        quizContent: {
+          isLoading: false,
+          fetchError: { message: "読み込みに失敗しました" },
+        },
       },
     });
 
     const reloadButton = screen.getByRole("button", { name: "再読み込み" });
-    const goHomeButton = screen.getByRole("button", { name: "ホームへ戻る" });
+    const goHomeButton = screen.getByRole("button", {
+      name: "クイズ一覧へ戻る",
+    });
 
-    expect(screen.getByText("エラー")).toBeInTheDocument();
+    expect(screen.getByText("読み込みに失敗しました")).toBeInTheDocument();
     expect(reloadButton).toBeInTheDocument();
     expect(goHomeButton).toBeInTheDocument();
   });
@@ -181,7 +186,9 @@ describe("QuizLoading.jsxのテスト", () => {
     });
 
     const user = userEvent.setup();
-    const goHomeButton = screen.getByRole("button", { name: "ホームへ戻る" });
+    const goHomeButton = screen.getByRole("button", {
+      name: "クイズ一覧へ戻る",
+    });
     await user.click(goHomeButton);
 
     expect(mockNavigate).toHaveBeenCalledWith("/");

@@ -6,12 +6,7 @@ import { useAuthForm } from "./useAuthForm";
 import AuthFormView from "./AuthFormView";
 
 const AuthForm = () => {
-  const {
-    isLoading,
-    signUpState,
-    signInState,
-    //  handleSignIn, handleSignUp
-  } = useAuthForm();
+  const { isLoading, signUpState, signInState } = useAuthForm();
 
   return (
     <AuthFormView

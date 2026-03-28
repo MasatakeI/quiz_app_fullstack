@@ -24,3 +24,8 @@
   margin-left: auto; /* 左の余白を自動調整 */
   margin-right: auto; /* 右の余白を自動調整 */
 }
+
+.error-icon {
+  color: red;
+  transform: scale(2);
+}

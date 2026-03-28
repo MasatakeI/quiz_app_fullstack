@@ -70,7 +70,7 @@ export const createQuizzes = async (category, type, difficulty, amount) => {
     }
     throw new QuizError({
       code: QUIZ_ERROR_CODE.NETWORK,
-      message: "クイズの取得に失敗しました",
+      message: "ネットワークエラー クイズの取得に失敗しました",
       cause: error,
     });
   }

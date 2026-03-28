@@ -171,10 +171,12 @@ describe("HistoryPage", () => {
         },
       });
 
-      const errorMessage = screen.getByText(
-        "履歴を見るには 新規登録 / ログイン してください",
+      const errorMessage = screen.getByText("履歴を見るにはログインが必要です");
+      const errorMessage2 = screen.getByText(
+        "アカウントを作成すると履歴を保存できます",
       );
       expect(errorMessage).toBeInTheDocument();
+      expect(errorMessage2).toBeInTheDocument();
 
       const openModalButton = screen.getByRole("button", {
         name: "新規登録 / ログイン",
@@ -183,7 +185,9 @@ describe("HistoryPage", () => {
       await user.click(openModalButton);
       expect(dispatchSpy).toHaveBeenCalledWith({ type: "auth/openAuthModal" });
 
-      const goHomeButton = screen.getByRole("button", { name: "ホームへ戻る" });
+      const goHomeButton = screen.getByRole("button", {
+        name: "クイズ一覧へ戻る",
+      });
       expect(goHomeButton).toBeInTheDocument();
       await user.click(goHomeButton);
       expect(mockNavigate).toHaveBeenCalledWith("/");

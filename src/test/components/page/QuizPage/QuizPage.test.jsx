@@ -152,12 +152,12 @@ describe("QuizPage.jsx", () => {
         quizContent: {
           ...commonOption.preloadedState.quizContent,
           isLoading: true,
-          fetchError: { message: "エラー" },
+          fetchError: { message: "読み込みに失敗しました" },
         },
       },
     });
 
-    expect(screen.getByText("エラー")).toBeInTheDocument();
+    expect(screen.getByText("読み込みに失敗しました")).toBeInTheDocument();
   });
 
   test("quizFinished=trueの時QuizResultが表示される", () => {

@@ -113,7 +113,9 @@ describe("QuizModel.jsのテスト", () => {
       } catch (error) {
         expect(error).toBeInstanceOf(QuizError);
         expect(error.code).toBe(QUIZ_ERROR_CODE.NETWORK);
-        expect(error.message).toBe("クイズの取得に失敗しました");
+        expect(error.message).toBe(
+          "ネットワークエラー クイズの取得に失敗しました",
+        );
         expect(error.cause).toBe(originalError);
       }
     });

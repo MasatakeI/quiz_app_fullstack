@@ -34,13 +34,16 @@ const HistoryPage = () => {
   if (!userId) {
     return (
       <div className="no-user-container">
-        <h3>履歴を見るには 新規登録 / ログイン してください</h3>
+        <div className="no-user-messages">
+          <h3>履歴を見るにはログインが必要です</h3>
+          <p>アカウントを作成すると履歴を保存できます</p>
+        </div>
         <div className="no-user">
           <Button onClickHandler={() => dispatch(openAuthModal())}>
             新規登録 / ログイン
           </Button>
           <Button onClickHandler={handleGoHome} variant="tertiary">
-            ホームへ戻る
+            クイズ一覧へ戻る
           </Button>
         </div>
       </div>

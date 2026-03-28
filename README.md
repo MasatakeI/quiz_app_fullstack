@@ -7,17 +7,27 @@
 </a>
 </p>
 
-> **CI/CD Pipeline**: GitHub Actionsによる自動テスト(Vitest)と、Vercelへの自動デプロイを統合。品質を担保した継続的デリバリーを実現しています
+> **SPA (Single Page Application)**:
+> GitHub Actionsによる自動テスト(Vitest)と、Vercelへの自動デプロイを統合。
+> 高いテスタビリティと、Middlewareによる堅牢なエラーハンドリングを実現したモダンなSPA構成です。
 
 ## 概要
 
 ![App Demo](./assets/GIF/quiz-flow.gif)
 
-Open Trivia Database API を活用した、カスタマイズ性の高い学習用 Web アプリケーション。
-個人開発ながら、**「実務レベルのテスタビリティ」と「疎結合なアーキテクチャ」**の完遂をテーマとし、フロントエンドから BaaS 連携まで一貫した設計・実装を行いました。
+Open Trivia Database API を活用した、カスタマイズ性の高い 学習用 Web アプリケーション。
+**「実務レベルのテスタビリティ」と「疎結合なアーキテクチャ」**の完遂をテーマとし、フロントエンドから BaaS 連携まで一貫した設計・実装を行いました。
 
 - **ライブデモ**: [https://quiz-app-zeta-pearl.vercel.app/](https://quiz-app-zeta-pearl.vercel.app/)
-- **開発環境**: React 18, Redux Toolkit, React Router 6, Firebase (Auth/Firestore), Vitest, React Testing Library
+- **開発環境**
+  | Layer | Stack |
+  | :--- | :--- |
+  | **UI / Framework** | React 18 / Vite |
+  | **State Management** | Redux Toolkit / Redux Thunk |
+  | **BaaS / Database** | Firebase (Auth / Firestore) |
+  | **Routing** | React Router 6 |
+  | **Testing** | Vitest / React Testing Library |
+  | **CI/CD / Hosting** | GitHub Actions / Vercel |
 
 ---
 
@@ -253,9 +263,8 @@ Vite の `import.meta.env` を活用し、機密情報を `.env` ファイルお
 
 - [x] GitHub Actionsによる自動テストのパイプライン構築
 - [x] GitHub ActionsによるVercelへの自動デプロイ設定
-- [ ]`React.lazy` / `Suspense` による Code Splitting
-- [ ]Service Worker によるオフラインプレイ対応
-
-```
-
-```
+- [ ] `React.lazy` / `Suspense` による Code Splitting
+- [ ] Service Worker によるオフラインプレイ対応
+- [ ] **Full-stack Migration**:
+  - 現在の Firebase 構成から、自前バックエンド（Node.js / NestJS + PostgreSQL）への移行。
+  - より複雑なクエリの最適化と、独自認証ロジックの構築に挑戦予定。

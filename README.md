@@ -259,12 +259,41 @@ Vite の `import.meta.env` を活用し、機密情報を `.env` ファイルお
 
 ---
 
-## 今後のロードマップ
+## 今後のロードマップ (Phase 2: Full-stack & Robustness)
+
+本プロジェクトのフロントエンド基盤を活かし、さらなるスケーラビリティとセキュリティを追求するため、以下の技術的課題に挑戦します。
+
+### 1. Backend Migration (BaaS to Custom API)
+
+現在の Firebase SDK によるクライアント直接操作から、**Node.js (Express/NestJS) を介した API 構成**へ移行。
+
+- **目的**: ビジネスロジックのサーバーサイド隠蔽、および RESTful API 設計スキルの習得。
+- **内容**: 独自ミドルウェアによる認可（Authorization）フローと、リクエストバリデーションの構築。
+
+### 2. データ整合性とクエリ最適化 (RDB / Indexing)
+
+Firestore のドキュメント指向から、**PostgreSQL 等の RDB** への移行、または複合インデックスの最適化。
+
+- **目的**: 統計情報やランキング等の複雑なリレーションを持つデータの効率的な取得。
+- **内容**: テーブル正規化とインデックス設計による N+1 問題の解決と、大規模データセットに対するパフォーマンス担保。
+
+### 3. セキュリティ・プロトコルの深化
+
+フロントエンドの表示制限に加え、**Firebase Security Rules** および **JWT (JSON Web Token)** の実装。
+
+- **目的**: `@firebase/rules-unit-testing` を導入し、バックエンド側で不正なリクエストを 100% 拒絶する堅牢なデータ保護の証明。
+
+### 4. 非同期処理と自動化 (Serverless Functions)
+
+**Firebase Cloud Functions** を導入したバックエンド・ジョブの実装。
+
+- **目的**: クイズ完了時のスコア計算の非同期化や、古い履歴データの自動クリーンアップなど、リクエスト/レスポンス外での重い処理の分離。
+
+---
+
+### 継続的な改善項目
 
 - [x] GitHub Actionsによる自動テストのパイプライン構築
 - [x] GitHub ActionsによるVercelへの自動デプロイ設定
 - [ ] `React.lazy` / `Suspense` による Code Splitting
 - [ ] Service Worker によるオフラインプレイ対応
-- [ ] **Full-stack Migration**:
-  - 現在の Firebase 構成から、自前バックエンド（Node.js / NestJS + PostgreSQL）への移行。
-  - より複雑なクエリの最適化と、独自認証ロジックの構築に挑戦予定。

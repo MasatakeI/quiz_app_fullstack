@@ -16,7 +16,7 @@
 ![App Demo](./assets/GIF/quiz-flow.gif)
 
 Open Trivia Database API を活用した、カスタマイズ性の高い 学習用 Web アプリケーション。
-**「実務レベルのテスタビリティ」と「疎結合なアーキテクチャ」**の完遂をテーマとし、フロントエンドから BaaS 連携まで一貫した設計・実装を行いました。
+**「実務レベルのテスタビリティ」**と **「疎結合なアーキテクチャ」**の完遂をテーマとし、フロントエンドから BaaS 連携まで一貫した設計・実装を行いました。
 
 - **ライブデモ**: [https://quiz-app-zeta-pearl.vercel.app/](https://quiz-app-zeta-pearl.vercel.app/)
 - **開発環境**

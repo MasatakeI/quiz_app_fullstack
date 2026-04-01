@@ -1,5 +1,12 @@
 # Quiz App Fullstack (WIP)
 
+## 🗺 Roadmap / Todo
+
+- [x] Backend API 基盤の構築 (Express)
+- [x] 履歴データの移行と降順ソートの実装
+- [ ] クイズ生成ロジックのサーバーサイド移管
+- [ ] TypeScript への完全移行
+
 Firebase を活用したクイズアプリをベースに、自律的なバックエンド（Node.js / Express）への移行とフルスタック化を目指す開発プロジェクトです。
 
 ## 概要

@@ -1,8 +1,26 @@
-//src/models/errors/quizHistory/quizHistoryMessages.js
+//client/src/models/errors/quizHistory/quizHistoryMessages.js
 
 import { QUIZ_HISTORY_ERROR_CODE } from "./quizHistoryErrorCode";
 
 export const QUIZ_HISTORY_ERROR_MAP = {
+  401: {
+    code: QUIZ_HISTORY_ERROR_CODE.UNAUTHORIZED,
+    message: "セッションが切れました.再度ログインしてください",
+  },
+  403: {
+    code: QUIZ_HISTORY_ERROR_CODE.PERMISSION,
+    message: "この操作を行う権限がありません",
+  },
+  404: {
+    code: QUIZ_HISTORY_ERROR_CODE.NOT_FOUND,
+    message: "指定されたデータが見つかりませんでした",
+  },
+  500: {
+    code: QUIZ_HISTORY_ERROR_CODE.EXTERNAL,
+    message: "サーバー側でエラーが発生しました。時間をおいて再度お試しください",
+  },
+
+  // Firebase Firestore のエラーコードマッピング
   "permission-denied": {
     code: QUIZ_HISTORY_ERROR_CODE.PERMISSION,
     message: "アクセス権限がありません",

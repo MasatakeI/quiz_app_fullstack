@@ -3,12 +3,8 @@
 import {
   addDoc,
   getDoc,
-  getDocs,
-  query,
   serverTimestamp,
-  orderBy,
   doc,
-  where,
   writeBatch,
 } from "firebase/firestore";
 
@@ -16,6 +12,8 @@ import { quizHistoryRef, db } from "@/firebase";
 import { QuizHistoryError } from "./errors/quizHistory/QuizHistoryError";
 import { QUIZ_HISTORY_ERROR_CODE } from "./errors/quizHistory/quizHistoryErrorCode";
 import { mapQuizHistoryError } from "./errors/quizHistory/mapQuizHistoryError";
+
+import { fetchQuizHistory } from "@/data_fetcher/QuizHistoryFetcher";
 
 import { format } from "date-fns";
 
@@ -93,21 +91,13 @@ export const addHistory = async (userId, resultData) => {
 
 export const fetchHistories = async (userId) => {
   try {
-    const q = query(
-      quizHistoryRef,
-      where("userId", "==", userId),
-      orderBy("date", "desc"),
-    );
-    const querySnapshot = await getDocs(q);
+    const data = await fetchQuizHistory(userId);
 
-    if (!querySnapshot.docs.length) {
+    if (!data || data.length === 0) {
       return [];
     }
 
-    // fetchHistories 内
-    return querySnapshot.docs.map((doc) => {
-      return createHistory(doc.id, doc.data());
-    });
+    return data.map((item) => createHistory(item.id, item));
   } catch (error) {
     throw mapQuizHistoryError(error);
   }

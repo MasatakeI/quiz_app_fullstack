@@ -1,10 +1,11 @@
-//src/models/errors/quizHistory/quizHistoryErrorCode.js
+//client/src/models/errors/quizHistory/quizHistoryErrorCode.js
 export const QUIZ_HISTORY_ERROR_CODE = {
   VALIDATION: "VALIDATION",
   INVALID_DATA: "INVALID_DATA",
   NOT_FOUND: "NOT_FOUND",
   NETWORK: "NETWORK",
   PERMISSION: "PERMISSION",
+  UNAUTHORIZED: "UNAUTHORIZED",
   EXTERNAL: "EXTERNAL",
   UNKNOWN: "UNKNOWN",
 };

@@ -1,4 +1,4 @@
-// src/data_fetcher/QuizFetcher.js
+// client/src/data_fetcher/QuizFetcher.js
 
 import axios from "axios";
 
@@ -24,7 +24,7 @@ export const fetchQuizzes = async (category, type, difficulty, amount) => {
     // console.log(response.data.results);
     return response.data.results;
   } catch (error) {
-    // console.error(error);
+    console.error(error);
     // throw error;
     throw new Error("fetch失敗(QuizFetcher)");
   }

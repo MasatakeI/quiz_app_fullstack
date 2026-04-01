@@ -7,7 +7,7 @@ require("dotenv").config();
 
 const serviceAccount = require("./service-account-file.json"); // ダウンロードしたファイル名
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 app.use(express.json());
 app.use(cors());
@@ -24,24 +24,59 @@ app.get("/api/histories/:userId", async (req, res) => {
     const userId = req.params.userId;
     const snapshot = await db
       .collection("histories")
-      // .where("userId", "==", userId)
-      // .orderBy("createdAt", "desc")
+      .where("userId", "==", userId)
+      .orderBy("date", "desc")
       .get();
 
     const histories = [];
     snapshot.forEach((doc) => {
-      histories.push({ id: doc.id, ...doc.data() });
+      const data = doc.data();
+      histories.push({
+        id: doc.id,
+        ...data,
+        date: data.date
+          ? data.date.toDate().toISOString()
+          : new Date().toISOString(),
+      });
     });
 
     res.status(200).json(histories);
   } catch (error) {
-    console.error("Firebase Admin 詳細エラー:", error);
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+});
 
-    res.status(500).json({
-      error: "Internal Server Error",
-      message: error.message,
-      code: error.code, // これで 'permission-denied' 以外の詳細がわかるかもしれません
+app.post("/api/histories", async (req, res) => {
+  try {
+    const data = req.body;
+    const docRef = await db.collection("histories").add({
+      ...data,
+      date: admin.firestore.FieldValue.serverTimestamp(),
     });
+
+    const newDoc = await docRef.get();
+    res.status(201).json({ id: docRef.id, ...newDoc.data() });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+});
+app.delete("/api/histories", async (req, res) => {
+  try {
+    const { ids } = req.body;
+    const batch = db.batch();
+
+    ids.forEach((id) => {
+      const ref = db.collection("histories").doc(id);
+      batch.delete(ref);
+    });
+
+    await batch.commit();
+    res.status(200).json({ ids });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
   }
 });
 

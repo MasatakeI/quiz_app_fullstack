@@ -1,25 +1,21 @@
-//src/models/QuizHistoryModel.js
+//client/src/models/QuizHistoryModel.js
 
-import {
-  addDoc,
-  getDoc,
-  serverTimestamp,
-  doc,
-  writeBatch,
-} from "firebase/firestore";
-
-import { quizHistoryRef, db } from "@/firebase";
 import { QuizHistoryError } from "./errors/quizHistory/QuizHistoryError";
 import { QUIZ_HISTORY_ERROR_CODE } from "./errors/quizHistory/quizHistoryErrorCode";
 import { mapQuizHistoryError } from "./errors/quizHistory/mapQuizHistoryError";
 
-import { fetchQuizHistory } from "@/data_fetcher/QuizHistoryFetcher";
+import {
+  fetchQuizHistory,
+  postQuizHistory,
+  deleteQuizHistories,
+} from "@/data_fetcher/QuizHistoryFetcher";
 
 import { format } from "date-fns";
 
 export const createHistory = (id, data) => {
   const isValid =
     data &&
+    id &&
     typeof data.difficulty === "string" &&
     typeof data.score === "number" &&
     typeof data.totalQuestions === "number" &&
@@ -28,21 +24,19 @@ export const createHistory = (id, data) => {
   if (!isValid) {
     throw new QuizHistoryError({
       code: QUIZ_HISTORY_ERROR_CODE.INVALID_DATA,
-      message: "無効なデータです",
+      message: "サーバーから受け取ったデータが不正です",
     });
   }
 
-  // 2. 日付の変換（Firebase Timestamp か 通常の Date/String かを判定）
-  const timestamp =
-    typeof data.date.toDate === "function"
-      ? data.date.toDate()
-      : new Date(data.date);
-  const dateObj = format(timestamp, "yyyy/MM/dd HH:mm");
+  const dateObj = new Date(data.date);
+
+  const finalDate = isNaN(dateObj.getTime()) ? new Date() : dateObj;
+  const formattedDate = format(finalDate, "yyyy/MM/dd HH:mm");
 
   return {
     id,
     category: data.category,
-    date: dateObj,
+    date: formattedDate,
     difficulty: data.difficulty,
     type: data.type,
     score: data.score,
@@ -63,25 +57,9 @@ export const addHistory = async (userId, resultData) => {
       });
     }
 
-    const postData = {
-      ...resultData,
-      userId,
-      date: serverTimestamp(),
-    };
+    const data = await postQuizHistory(userId, resultData);
 
-    const docRef = await addDoc(quizHistoryRef, postData);
-    const snapShot = await getDoc(docRef);
-
-    if (!snapShot.exists()) {
-      throw new QuizHistoryError({
-        code: QUIZ_HISTORY_ERROR_CODE.UNKNOWN,
-        message: "クイズ結果の追加に失敗しました",
-      });
-    }
-
-    const data = snapShot.data();
-
-    const model = createHistory(docRef.id, data);
+    const model = createHistory(data.id, data);
 
     return model;
   } catch (error) {
@@ -107,13 +85,8 @@ export const performDelete = async (ids) => {
   if (!ids || ids.length === 0) return [];
 
   try {
-    const batch = writeBatch(db);
-    ids.forEach((id) => {
-      const docRef = doc(quizHistoryRef, id);
-      batch.delete(docRef);
-    });
-    await batch.commit();
-    return ids;
+    const response = await deleteQuizHistories(ids);
+    return response.ids;
   } catch (error) {
     throw mapQuizHistoryError(error);
   }

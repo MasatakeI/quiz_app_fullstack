@@ -1,7 +1,17 @@
 # Quiz App Backend API
 
 Node.js と Express を使用した、クイズアプリ専用のバックエンド API サーバーです。
-Firebase Admin SDK を介して、Firestore とのセキュアなデータ連携を実現しています。
+TypeScript による厳格な型管理と Firebase Admin SDK を介したセキュアなデータ連携を実現しています。
+
+---
+
+## 🛠 技術スタック (Tech Stack)
+
+- **Runtime**: Node.js (v18+)
+- **Framework**: Express
+- **Language**: **TypeScript** (ts-node-dev による高速な開発サイクル)
+- **SDK**: Firebase Admin SDK
+- **Formatter/Linter**: ESLint / Prettier
 
 ---
 
@@ -13,29 +23,56 @@ Firebase Admin SDK を介して、Firestore とのセキュアなデータ連携
 | `POST`   | `/api/histories`         | クイズ結果の新規保存                   |
 | `DELETE` | `/api/histories`         | 指定された ID 配列による一括削除       |
 
----
+### リクエスト / レスポンス例
 
-## 🛠 技術的判断の背景 (Technical Notes)
+#### `POST /api/histories`
 
-本プロジェクトでは、スケーラビリティと保守性を考慮し、以下の設計判断を行っています。
+**Request Body:**
 
-### 1. Firebase Admin SDK の採用
+```json
+{
+  "userId": "user123",
+  "score": 8,
+  "totalQuestions": 10,
+  "category": "Science",
+  "difficulty": "medium",
+  "type": "multiple"
+}
 
-サーバーサイドから Firestore を操作することで、フロントエンドに秘匿性の高い特権（Batch 削除など）を直接持たせない設計にしています。これにより、セキュリティルールの複雑化を抑え、バックエンドでの一貫した一括処理を可能にしています。
+{
+  "id": "generated-firestore-id",
+  "userId": "user123",
+  "score": 8,
+  "totalQuestions": 10,
+  "category": "Science",
+  "difficulty": "medium",
+  "type": "multiple",
+  "date": "2026-04-02T05:00:00.000Z"
+}
+```
 
-### 2. CORS (Cross-Origin Resource Sharing) 設定
+## 技術的判断の背景 (Technical Notes)
 
-フロントエンドの標準的な開発ポート（デフォルト: `5173`）からのリクエストを許可するように構成。開発環境と本番環境で柔軟に切り替え可能な構造を目指しています。
+Firebase Admin SDK の採用: サーバーサイドから Firestore を操作することで、フロントエンドに特権を持たせないセキュアな設計を採用。
 
-### 3. データ整合性の担保
+データ整合性の担保: 保存時にサーバー側で serverTimestamp() を付与。取得時はフロントエンドが扱いやすい ISO 8601 形式 に統一して返却。
 
-- **保存時**: サーバー側で `serverTimestamp()` を付与することで、クライアントの時刻設定に依存しない正確な記録を保証。
-- **取得時**: フロントエンドの Model 層が解釈しやすい **ISO 8601 形式** に変換して返却し、シリアライズによるデータ不整合を防止しています。
+CORS 設定: 開発用ポート（5173）を許可し、開発と本番で柔軟に切り替え可能な構造を構築。
 
----
+## 開発の始め方
 
-## セットアップ時の注意 (Setup)
+依存関係のインストール
 
-> [!IMPORTANT]
-> 実行には Firebase の**サービスアカウントキー (`service-account-file.json`)** が必要です。
-> `server/` 直下に配置し、Git にコミットされないよう注意してください（`.gitignore` での除外を推奨）。
+```Bash
+npm install
+Firebase サービスアカウントの配置
+Firebase コンソールから取得した サービスアカウントキー (service-account-file.json) を server/ 直下に配置してください。
+```
+
+[!IMPORTANT]
+このファイルは Git にコミットしないでください（.gitignore 推奨）。
+
+## サーバーの起動
+
+Bash
+npm run dev

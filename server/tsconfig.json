@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "rootDir": "./src", // ソースの場所を明示
+    "outDir": "./dist", // ビルド後の出力先
+    "esModuleInterop": true, // import 構文の互換性
+    "resolveJsonModule": true, // JSONファイルの読み込みを許可
+    "strict": true, // 厳格な型チェック
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"], // src 配下のファイルを対象にする
+  "exclude": ["node_modules"]
+}

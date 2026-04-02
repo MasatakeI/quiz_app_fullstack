@@ -236,14 +236,14 @@ describe("quizHistoryThunks", () => {
 
         const error = {
           code: QUIZ_HISTORY_ERROR_CODE.NETWORK,
-          message: "ネットワークエラーが発生しました",
+          message: "サーバーと通信できません。接続を確認してください",
         };
         mockFn.mockRejectedValue(error);
 
         const result = await callThunk(thunk, params);
         expect(result.payload).toMatchObject({
           code: QUIZ_HISTORY_ERROR_CODE.NETWORK,
-          message: "ネットワークエラーが発生しました",
+          message: "サーバーと通信できません。接続を確認してください",
           field: undefined,
         });
 

@@ -5,11 +5,12 @@ import { buildHistory } from "./buildHistory";
 export const newHistory = buildHistory({
   id: "mock-id-4",
   category: "sports",
-  iso: "2020-01-04T12:00:00",
+  iso: "2026-04-01T22:00:00",
   difficulty: "easy",
   score: 3,
   totalQuestions: 10,
   accuracy: 0.3,
+  type: "multiple",
 });
 
 export const newHistoryInput = {
@@ -18,4 +19,5 @@ export const newHistoryInput = {
   score: newHistory.score,
   totalQuestions: newHistory.totalQuestions,
   accuracy: newHistory.accuracy,
+  type: newHistory.type,
 };

@@ -10,6 +10,7 @@ export const buildHistory = ({
   score,
   totalQuestions,
   accuracy,
+  type,
 }) => {
   const date = new Date(iso);
 
@@ -25,5 +26,6 @@ export const buildHistory = ({
     score,
     totalQuestions,
     accuracy,
+    type,
   };
 };

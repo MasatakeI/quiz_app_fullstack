@@ -54,13 +54,24 @@ describe("mapQuizHistoryError.test", () => {
     });
   });
 
-  test("未知のエラーの場合 Firestoreにフォールバックする", () => {
+  test("未知のエラーの場合 UNKOWNにフォールバックする", () => {
     const error = { code: "some-new-error" };
 
     const result = mapQuizHistoryError(error);
     expect(result).toMatchObject({
-      code: QUIZ_HISTORY_ERROR_CODE.EXTERNAL,
-      message: "データベースエラーが発生しました",
+      code: QUIZ_HISTORY_ERROR_CODE.UNKNOWN,
+      message: "予期せぬエラーが発生しました",
+    });
+  });
+
+  test("AxiosErrorでresponseがない場合 NETWORKにフォールバックする", () => {
+    const error = { isAxiosError: true, response: undefined };
+
+    const result = mapQuizHistoryError(error);
+
+    expect(result).toMatchObject({
+      code: QUIZ_HISTORY_ERROR_CODE.NETWORK,
+      message: "サーバーと通信できません。接続を確認してください",
     });
   });
 

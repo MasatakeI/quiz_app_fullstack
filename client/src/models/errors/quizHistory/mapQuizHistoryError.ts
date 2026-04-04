@@ -4,18 +4,22 @@ import { QuizHistoryError } from "./QuizHistoryError";
 import { QUIZ_HISTORY_ERROR_CODE } from "./quizHistoryErrorCode";
 import { QUIZ_HISTORY_ERROR_MAP } from "./quizHistoryMessages";
 
-export const mapQuizHistoryError = (error) => {
+export const mapQuizHistoryError = (error: any) => {
   if (error instanceof QuizHistoryError) return error;
 
-  const key = error?.response?.status || error?.code;
-  const mapped = QUIZ_HISTORY_ERROR_MAP[key];
+  const key: string | number | undefined =
+    error?.response?.status || error?.code;
 
-  if (mapped) {
-    return new QuizHistoryError({
-      code: mapped.code,
-      message: mapped.message,
-      cause: error,
-    });
+  if (key !== undefined) {
+    const mapped = QUIZ_HISTORY_ERROR_MAP[key];
+
+    if (mapped) {
+      return new QuizHistoryError({
+        code: mapped.code,
+        message: mapped.message,
+        cause: error,
+      });
+    }
   }
 
   if (error?.isAxiosError && !error.response) {

@@ -1,8 +1,16 @@
-//client/src/models/errors/quizHistory/quizHistoryMessages.js
+//client/src/models/errors/quizHistory/quizHistoryMessages.ts
 
 import { QUIZ_HISTORY_ERROR_CODE } from "./quizHistoryErrorCode";
 
-export const QUIZ_HISTORY_ERROR_MAP = {
+export interface QuizHistoryErrorEntry {
+  code: string;
+  message: string;
+}
+
+export const QUIZ_HISTORY_ERROR_MAP: Record<
+  string | number,
+  QuizHistoryErrorEntry
+> = {
   401: {
     code: QUIZ_HISTORY_ERROR_CODE.UNAUTHORIZED,
     message: "セッションが切れました.再度ログインしてください",

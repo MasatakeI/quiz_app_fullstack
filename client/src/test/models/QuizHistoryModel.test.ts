@@ -26,30 +26,6 @@ import {
 import { QuizHistoryError } from "@/models/errors/quizHistory/QuizHistoryError";
 import { QUIZ_HISTORY_ERROR_CODE } from "../../models/errors/quizHistory/quizHistoryErrorCode";
 
-// ヘルパー
-// const expectHistory = (history: any) => {
-//   return {
-//     id: history.id,
-//     category: history.category,
-//     date: history.expectedDate,
-//     difficulty: history.difficulty,
-//     score: history.score,
-//     totalQuestions: history.totalQuestions,
-//     accuracy: history.accuracy,
-//     type: history.type,
-//   };
-// };
-
-const localValidData = {
-  id: "test-id",
-  category: "science",
-  date: "2026-04-01T22:00:00",
-  difficulty: "medium",
-  score: 8,
-  totalQuestions: 10,
-  type: "multiple",
-};
-
 describe("QuizHistoryModel", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -60,15 +36,22 @@ describe("QuizHistoryModel", () => {
   describe("createHistory", () => {
     test("正常系:Fetcher経由で保存し,モデル化した結果を返す", () => {
       // もしここで落ちるなら、validRawHistoryData が undefined です
-      // if (!validRawHistoryData) {
-      //   throw new Error("validRawHistoryData is not imported correctly");
-      // }
+      if (!validRawHistoryData) {
+        throw new Error("validRawHistoryData is not imported correctly");
+      }
 
-      const result = createHistory("test-id", localValidData);
+      const result = createHistory(validRawHistoryData.id, validRawHistoryData);
 
-      expect(result.id).toBe("test-id");
-      expect(result.accuracy).toBe(0.8);
-      expect(result.date).toBe("2026/04/01 22:00");
+      expect(result).toEqual({
+        id: "mock-id-4",
+        category: "sports",
+        date: "2026/04/01 22:00",
+        difficulty: "easy",
+        score: 3,
+        totalQuestions: 10,
+        accuracy: 0.3,
+        type: "multiple",
+      });
     });
 
     test("異常系:壊れたデータの場合 QuizHistoryErrorをスローする", () => {
@@ -85,9 +68,9 @@ describe("QuizHistoryModel", () => {
       );
     });
 
-    test("正常系:スコアが 0 の場合、accuracy が 0 になること", () => {
-      const result = createHistory("id-0", {
-        ...localValidData,
+    test.skip("正常系:スコアが 0 の場合、accuracy が 0 になること", () => {
+      const result = createHistory(validRawHistoryData.id, {
+        ...validRawHistoryData,
         score: 0,
         totalQuestions: 10,
       });

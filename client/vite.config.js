@@ -39,8 +39,10 @@ export default defineConfig({
         "coverage2",
       ],
     },
-    deps: {
-      inline: [/src/], // src 配下のファイルをインラインで処理させる
+    server: {
+      deps: {
+        inline: [/src/], // src 配下のファイルをインラインで処理させる
+      },
     },
   },
 

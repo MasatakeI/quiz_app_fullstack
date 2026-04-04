@@ -39,10 +39,13 @@ export const createHistory = (
   id: string,
   data: Partial<RawQuizHistory>,
 ): QuizHistoryModel => {
+  // 必須項目が存在し、かつ型が正しいことを厳密にチェック
   const isValid =
-    (data && id && typeof data.difficulty === "string") ||
-    typeof data.score === "number" ||
-    typeof data.totalQuestions === "number" ||
+    data &&
+    id &&
+    typeof data.difficulty === "string" &&
+    typeof data.score === "number" &&
+    typeof data.totalQuestions === "number" &&
     typeof data.date === "string";
 
   if (!isValid) {
@@ -52,21 +55,24 @@ export const createHistory = (
     });
   }
 
+  // データの抽出（分割代入）
   const { score, totalQuestions, date, category, difficulty, type } = data;
-  const dateObj = new Date(date);
+
+  // 日付の処理
+  const dateObj = new Date(date as string);
   const finalDate = isNaN(dateObj.getTime()) ? new Date() : dateObj;
   const formattedDate = format(finalDate, "yyyy/MM/dd HH:mm");
 
   return {
-    id,
-    category: category,
+    id: String(id), // IDを文字列に正規化
+    category: category ?? "unknown", // null合体演算子で安全に
     date: formattedDate,
     difficulty,
-    type: type,
+    type: type ?? "multiple",
     score,
     totalQuestions,
     accuracy:
-      data.totalQuestions > 0 ? Number((score / totalQuestions).toFixed(2)) : 0,
+      totalQuestions > 0 ? Number((score / totalQuestions).toFixed(2)) : 0,
   };
 };
 

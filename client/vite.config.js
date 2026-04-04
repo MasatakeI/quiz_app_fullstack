@@ -1,3 +1,5 @@
+//vite.config.js
+
 /// <reference types="vitest" />
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
@@ -36,6 +38,9 @@ export default defineConfig({
         ".github/**",
         "coverage2",
       ],
+    },
+    deps: {
+      inline: [/src/], // src 配下のファイルをインラインで処理させる
     },
   },
 
